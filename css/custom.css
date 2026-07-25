@@ -1,0 +1,34 @@
+/*
+ * 自訂樣式覆寫
+ * ------------------------------------------------------------------
+ * 所有外觀微調都寫在這裡，不要去改 node_modules/hexo-theme-fluid/ 底下的檔案
+ * （那些改動會在下次 npm install 時被蓋掉）。
+ *
+ * 這個檔案由 _config.fluid.yml 的 custom_css 掛載，載入順序在主題 CSS 之後，
+ * 所以同樣權重的規則會以這裡為準。
+ *
+ * 深色模式請用 [data-user-color-scheme="dark"] 這個選擇器，Fluid 會把它加在
+ * <html> 上，例如：
+ *   [data-user-color-scheme="dark"] .markdown-body { color: #ddd; }
+ */
+
+/* 讓行內程式碼更好認 */
+.markdown-body code:not([class*="language-"]) {
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 88%;
+}
+
+/* 區塊公式在手機上可能會超出畫面，讓它可以獨立橫向捲動 */
+.markdown-body .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+}
+
+/* 表格在窄螢幕也能捲動 */
+.markdown-body .table-wrapper,
+.markdown-body table {
+  max-width: 100%;
+  overflow-x: auto;
+}
