@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "new": "bash tools/new-post.sh",
+    "draft": "hexo new draft",
+    "draft:publish": "hexo publish",
     "server": "hexo server",
+    "server:draft": "hexo server --draft",
     "build": "hexo generate",
     "clean": "hexo clean",
     "rebuild": "hexo clean && hexo generate"

@@ -12,6 +12,11 @@ _multiconfig.yml
 # 依賴（用 package-lock.json 還原，CI 會自己跑 npm ci）
 node_modules/
 
+# 私人草稿庫 — 不進這個（公開的）repo
+# source/_drafts/ 自己是一個獨立的 git repo，推到私人 remote，
+# 詳見 README 的「私人草稿庫」章節。
+source/_drafts/
+
 # 機密資訊（HackMD API token 等）— 絕對不要進版控
 .env
 .env.*

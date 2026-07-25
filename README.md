@@ -85,6 +85,48 @@ git push -u origin main
 
 ---
 
+## 私人草稿庫
+
+因為 repo 是 public,放進去的東西就等於公開 —— **即使文章標了未發布,檔案還是躺在 repo 裡讓人看得到**。所以寫到一半的、或根本不打算公開的筆記,要放在另一個地方。
+
+作法是:`source/_drafts/` 這個資料夾**不進這個 repo**(已寫進 `.gitignore`),它自己是一個獨立的 git repo,推到你的**私人** remote。
+
+### 一次性設定
+
+先在 GitHub 建一個 **private** repo(名字隨你,例如 `notes-private`)。GitHub 的私人 repo 是免費的 —— 要付費的只有「從 private repo 發布 Pages」,而我們不需要那個。
+
+```bash
+cd ~/homepage/source/_drafts
+git init -b main
+git remote add origin https://github.com/dnnnda0382/notes-private.git
+git add -A && git commit -m "init: 私人筆記庫"
+git push -u origin main
+```
+
+### 日常用法
+
+```bash
+npm run draft "還沒想好的標題"    # 建立草稿（存到 source/_drafts/）
+npm run server:draft              # 預覽時把草稿也顯示出來
+npm run draft:publish "標題"      # 決定要發了 → 移到 source/_posts/
+```
+
+草稿的備份跟發布是**兩個獨立的 repo**,各推各的:
+
+```bash
+cd ~/homepage/source/_drafts && git add -A && git commit -m "wip" && git push   # 備份草稿
+cd ~/homepage && git add -A && git commit -m "post: 標題" && git push           # 發布文章
+```
+
+### 這樣設計的好處
+
+- **草稿是私密的**,但一樣有版控、有雲端備份,不會因為電腦壞掉就沒了
+- **本機預覽是完整的** —— `npm run server:draft` 會用跟正式站一樣的方式渲染,LaTeX 公式、程式碼高亮、目錄全都看得到,不像純文字編輯器只能看原始碼
+- **發布只是移動檔案**,`npm run draft:publish` 會把檔案從 `_drafts` 搬到 `_posts`,不用複製貼上
+- **不用依賴 HackMD**
+
+---
+
 ## 常見任務速查
 
 改完設定記得先 `npm run server` 看一下沒壞再 commit。
@@ -123,14 +165,25 @@ giscus:
 
 31 篇裡目前搬了 4 篇,剩 27 篇。
 
+**推薦作法:全部先搬進私人草稿庫**,再逐篇挑要發布的。這樣就能徹底不用再開 HackMD:
+
+```bash
+node tools/import-hackmd.mjs --all --out source/_drafts   # 全搬進私人草稿庫
+npm run server:draft                                       # 預覽（草稿也會顯示）
+npm run draft:publish "某篇標題"                           # 挑要發的移到 _posts
+```
+
+只想搬特定幾篇的話:
+
 ```bash
 node tools/import-hackmd.mjs --list                # 列出全部與 id
 node tools/import-hackmd.mjs --id <id> --dry-run   # 預覽,不寫檔
-node tools/import-hackmd.mjs --id <id>             # 匯入單篇
-node tools/import-hackmd.mjs --all --draft         # 全搬,但標成未發布
+node tools/import-hackmd.mjs --id <id>             # 匯入單篇到 _posts
 ```
 
-`--draft` 會加上 `published: false`,不會出現在網站上。逐篇檢查完把那行刪掉就會發布。
+> ⚠️ **不要用 `--all` 直接匯進 `source/_posts/`**,即使加了 `--draft`。
+> `--draft` 只是加上 `published: false` 讓文章不出現在網站上,**檔案本身還是會進
+> 這個公開的 repo**,任何人都讀得到。私人內容一律走 `--out source/_drafts`。
 
 匯入後要自己補的:**tags / categories**(HackMD 那邊沒打)、**圖片**(還指向 HackMD 外部網址,原檔刪掉會失效)、**程式碼區塊的語言標記**(沒標就不會上色)。
 
@@ -209,7 +262,8 @@ lsof -ti:4000 | xargs kill
 
 ```
 ~/homepage/
-├── source/_posts/          ← 文章都在這
+├── source/_posts/          ← 已發布的文章（公開）
+├── source/_drafts/         ← 私人草稿庫（獨立的 private repo，不進這個 repo）
 ├── source/about/index.md   ← 關於頁
 ├── source/css/custom.css   ← 自訂樣式
 ├── source/img/             ← 圖片放這
@@ -228,11 +282,14 @@ lsof -ti:4000 | xargs kill
 ## 指令總表
 
 ```bash
-npm run new "標題"   # 新增文章
-npm run server       # 本機預覽 (localhost:4000)
-npm run build        # 產生靜態檔到 public/
-npm run clean        # 清快取
-npm run rebuild      # clean + build
+npm run new "標題"            # 新增文章（直接進 _posts，會發布）
+npm run draft "標題"          # 新增草稿（進 _drafts，私密不發布）
+npm run draft:publish "標題"  # 草稿 → 文章
+npm run server                # 本機預覽 (localhost:4000)
+npm run server:draft          # 本機預覽，含草稿
+npm run build                 # 產生靜態檔到 public/
+npm run clean                 # 清快取
+npm run rebuild               # clean + build
 ```
 
 ## 參考連結

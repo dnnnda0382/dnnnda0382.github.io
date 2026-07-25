@@ -46,11 +46,14 @@ Node 20.19+ 才有的 `require(ESM)` 功能來載入 ESM-only 的 `strip-ansi`�
 ## 常用指令
 
 ```bash
-npm run new "文章標題"   # 新增一篇文章，印出檔案路徑
-npm run server           # 本機預覽 → http://localhost:4000
-npm run build            # 產生靜態檔到 public/
-npm run clean            # 清掉 public/ 和快取 db.json
-npm run rebuild          # clean + build，設定改壞時用這個
+npm run new "文章標題"        # 新增文章（進 _posts，會公開）
+npm run draft "標題"          # 新增草稿（進 _drafts，私密）
+npm run draft:publish "標題"  # 草稿 → 文章
+npm run server                # 本機預覽 → http://localhost:4000
+npm run server:draft          # 本機預覽，含草稿
+npm run build                 # 產生靜態檔到 public/
+npm run clean                 # 清掉 public/ 和快取 db.json
+npm run rebuild               # clean + build，設定改壞時用這個
 ```
 
 底層對應的是 `hexo new` / `hexo server` / `hexo generate` / `hexo clean`，
@@ -76,10 +79,12 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 ├── .nvmrc                   # Node 版本
 ├── scaffolds/post.md        # 新文章的範本（front-matter 長相）
 ├── source/
-│   ├── _posts/              # ← 文章都放這裡
+│   ├── _posts/              # ← 已發布的文章（公開）
+│   ├── _drafts/             # ← 私人草稿庫（獨立 private repo，不進版控）
 │   ├── about/index.md       # 關於頁
 │   └── css/custom.css       # ← 自訂樣式覆寫
 ├── tools/new-post.sh        # npm run new 背後的腳本
+├── tools/import-hackmd.mjs  # HackMD 匯入工具
 └── .github/workflows/deploy.yml  # 自動部署
 ```
 
@@ -186,6 +191,30 @@ categories: []
 分類目前用：`筆記`、`雜記`。
 
 ---
+
+## 私人草稿庫（重要）
+
+`source/_drafts/` **不屬於這個 repo** —— 它被 `.gitignore` 排除，本身是一個獨立的
+git repo，推到使用者的私人 remote。
+
+**為什麼**：這個網站的 repo 是 public。`published: false` 只能讓文章不出現在網站上，
+**擋不住 repo** —— 檔案還是躺在版控裡讓任何人讀得到。所以私人內容一律放 `_drafts`。
+
+因此：
+
+- **不要**把私人／未定稿的內容寫進 `source/_posts/`，即使加了 `published: false`
+- **不要**把 `source/_drafts/` 從 `.gitignore` 拿掉
+- 從 HackMD 匯入私人筆記時，一律加 `--out source/_drafts`
+- 在 `source/_drafts/` 裡面下 git 指令時，操作的是「私人筆記庫」那個 repo，
+  不是網站的 repo，別搞混
+
+相關指令：
+
+```bash
+npm run draft "標題"          # 建立草稿
+npm run server:draft          # 預覽時包含草稿
+npm run draft:publish "標題"  # 把草稿移到 _posts（等於決定要公開了）
+```
 
 ## 從 HackMD 匯入舊筆記
 
