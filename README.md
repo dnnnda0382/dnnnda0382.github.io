@@ -71,9 +71,24 @@ Repo 名稱必須**完全等於** `dnnnda0382.github.io`,大小寫和後綴都�
 
 ```bash
 cd ~/homepage
-git remote add origin https://github.com/dnnnda0382/dnnnda0382.github.io.git
+git remote add origin git@github.com:dnnnda0382/dnnnda0382.github.io.git
 git push -u origin main
 ```
+
+> 這裡用的是 **SSH** 網址(`git@github.com:帳號/repo.git`),因為這台機器是用 SSH key
+> 連 GitHub。不要用 GitHub 網頁上預設顯示的 `https://` 網址 —— 那個會要求帳密,
+> 而 GitHub 早就不接受密碼認證了。
+>
+> 如果不小心設成 https,不用重來,直接改掉就好:
+>
+> ```bash
+> git remote set-url origin git@github.com:dnnnda0382/dnnnda0382.github.io.git
+> git remote -v                     # 確認改好了
+> ```
+>
+> 測試 SSH 通不通:`ssh -T git@github.com`
+> (成功時會回 `Hi dnnnda0382! You've successfully authenticated...`,
+> 然後以 exit code 1 結束 —— **這是正常的**,不是錯誤。)
 
 ### 3. 開啟 GitHub Pages
 
@@ -98,7 +113,7 @@ git push -u origin main
 ```bash
 cd ~/homepage/source/_drafts
 git init -b main
-git remote add origin https://github.com/dnnnda0382/notes-private.git
+git remote add origin git@github.com:dnnnda0382/notes-private.git
 git add -A && git commit -m "init: 私人筆記庫"
 git push -u origin main
 ```
