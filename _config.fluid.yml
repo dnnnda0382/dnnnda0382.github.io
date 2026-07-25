@@ -1,0 +1,97 @@
+# Fluid 主題設定「覆寫檔」
+# ------------------------------------------------------------------
+# 這個檔案只需要寫「跟主題預設值不同」的項目，Hexo 會把它深層合併(deep merge)
+# 到 node_modules/hexo-theme-fluid/_config.yml 之上。
+#
+# ⚠️ 絕對不要直接改 node_modules/hexo-theme-fluid/ 底下的檔案，
+#    那些改動會在下次 npm install 時被覆蓋掉。要調整一律改這裡。
+#
+# 完整可用選項請參考主題預設檔：node_modules/hexo-theme-fluid/_config.yml
+# 官方文件：https://hexo.fluid-dev.com/docs/
+# ------------------------------------------------------------------
+
+# 瀏覽器分頁標題分隔符
+tab_title_separator: " | "
+
+# 程式碼區塊
+code:
+  # 顯示語言標籤（右上角顯示 CPP / PYTHON 等）
+  language:
+    enable: true
+    default: "TEXT"
+
+  # 複製按鈕
+  copy_btn: true
+
+  highlight:
+    enable: true
+    line_number: true
+    # 使用 prismjs（比 highlight.js 樣式現代）
+    # ⚠️ 這個值會強制覆寫根目錄 _config.yml 的 syntax_highlighter，兩邊請保持一致
+    lib: "prismjs"
+    prismjs:
+      style: "default"          # 淺色模式配色
+      style_dark: "tomorrow night"  # 深色模式配色
+      # true = build 時就把顏色產生好（靜態），前端不需要載 prismjs JS
+      preprocess: true
+
+# 深色模式
+dark_mode:
+  enable: true
+  default: auto  # 跟隨系統設定
+
+# 導覽列
+navbar:
+  blog_title: "DnDA's Notes"
+  menu:
+    - { key: "home", link: "/", icon: "iconfont icon-home-fill" }
+    - { key: "archive", link: "/archives/", icon: "iconfont icon-archive-fill" }
+    - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
+    - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
+    - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
+
+# 站內搜尋（Fluid 內建 local search，不需額外裝 plugin）
+search:
+  enable: true
+
+# 首頁
+index:
+  slogan:
+    enable: true
+    text: "用 Markdown 記下所有值得記下的事"
+
+# 文章頁
+post:
+  # 數學公式
+  # ------------------------------------------------------------------
+  # 這裡設 katex 只會載入 KaTeX 的「CSS」，不會載入 auto-render JS。
+  # 公式實際上是由 hexo-renderer-markdown-it + @renbaoshuo/markdown-it-katex
+  # 在 build 階段就渲染成 HTML 的，所以兩者互補、不會重複渲染。
+  math:
+    enable: true
+    specific: false  # false = 所有文章都可直接寫公式，不用在 front-matter 加 math: true
+    engine: katex
+
+  # 目錄（TOC）
+  toc:
+    enable: true
+    placement: right
+    expand_all: true
+    headingSelector: "h1,h2,h3,h4,h5,h6"
+    collapseDepth: 0
+
+  # 文章底部版權宣告
+  copyright:
+    enable: false
+
+# 自訂樣式覆寫（路徑相對於 source/ 目錄）
+# 要調整外觀請改 source/css/custom.css，不要動 node_modules 裡的主題原始檔
+custom_css:
+  - /css/custom.css
+
+# 靜態資源 CDN
+static_prefix:
+  # ⚠️ KaTeX 的 CSS 版本必須和 package.json 裡 katex 的版本完全一致，
+  #    否則字型 metrics 對不上、公式會排版錯位。
+  #    改 katex 版本時，這裡的網址也要一起改。
+  katex: https://cdn.jsdelivr.net/npm/katex@0.18.1/dist/

@@ -1,0 +1,48 @@
+name: Deploy
+
+# push 到 main 就自動 build 並發布到 gh-pages branch。
+# 平常寫完文章只要 git push，不需要在本機跑 hexo generate 或 hexo deploy。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # 也可以在 GitHub 網頁上手動觸發
+
+# peaceiris/actions-gh-pages 需要寫入權限才能推到 gh-pages branch
+permissions:
+  contents: write
+
+# 連續 push 時只保留最新一次部署，避免互相覆蓋
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc # 跟本機用同一個 Node 版本
+          cache: npm
+
+      # 用 package-lock.json 精準還原依賴版本，確保 CI 跟本機 build 出來的東西一致
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npx hexo clean && npx hexo generate
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "deploy: ${{ github.event.head_commit.message }}"

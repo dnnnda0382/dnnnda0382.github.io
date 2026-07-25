@@ -1,0 +1,20 @@
+# 系統
+.DS_Store
+Thumbs.db
+
+# Hexo 產物與快取（都不要進版控）
+db.json
+public/
+.deploy*/
+_multiconfig.yml
+*.log
+
+# 依賴（用 package-lock.json 還原，CI 會自己跑 npm ci）
+node_modules/
+
+# 編輯器暫存檔
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
