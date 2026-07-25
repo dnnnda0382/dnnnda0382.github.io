@@ -90,7 +90,7 @@ git push -u origin main
 > (成功時會回 `Hi dnnnda0382! You've successfully authenticated...`,
 > 然後以 exit code 1 結束 —— **這是正常的**,不是錯誤。)
 
-### 3. 開啟 GitHub Pages
+### 3. 開啟 GitHub Pages ← **還沒做**
 
 推上去之後,GitHub Actions 會自動跑一次,建立出 `gh-pages` branch。等它跑完(repo 的 **Actions** 頁籤看得到進度),然後:
 
@@ -106,16 +106,27 @@ git push -u origin main
 
 作法是:`source/_drafts/` 這個資料夾**不進這個 repo**(已寫進 `.gitignore`),它自己是一個獨立的 git repo,推到你的**私人** remote。
 
-### 一次性設定
+### 一次性設定(**已完成**)
 
-先在 GitHub 建一個 **private** repo(名字隨你,例如 `notes-private`)。GitHub 的私人 repo 是免費的 —— 要付費的只有「從 private repo 發布 Pages」,而我們不需要那個。
+草稿庫用的是 private repo [`private_notes`](https://github.com/dnnnda0382/private_notes)。
+GitHub 的私人 repo 是免費的 —— 要付費的只有「從 private repo 發布 Pages」,而我們不需要那個。
+
+設定已經做好了,以下留存供換電腦時參考:
 
 ```bash
 cd ~/homepage/source/_drafts
 git init -b main
-git remote add origin git@github.com:dnnnda0382/notes-private.git
+git remote add origin git@github.com:dnnnda0382/private_notes.git
 git add -A && git commit -m "init: 私人筆記庫"
 git push -u origin main
+```
+
+換新電腦時是用 clone 的,不是重跑上面那段:
+
+```bash
+git clone git@github.com:dnnnda0382/dnnnda0382.github.io.git ~/homepage
+cd ~/homepage && npm install
+git clone git@github.com:dnnnda0382/private_notes.git source/_drafts
 ```
 
 ### 日常用法
