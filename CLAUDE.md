@@ -187,6 +187,44 @@ categories: []
 
 ---
 
+## 從 HackMD 匯入舊筆記
+
+`tools/import-hackmd.mjs` 會透過 HackMD API 把筆記轉成 Hexo 文章。
+
+```bash
+node tools/import-hackmd.mjs --list                # 列出所有筆記與 id
+node tools/import-hackmd.mjs --id <id> --dry-run   # 預覽轉換結果，不寫檔
+node tools/import-hackmd.mjs --id <id> --id <id2>  # 匯入指定筆記
+node tools/import-hackmd.mjs --all --draft         # 全部匯入，但標成未發布
+```
+
+Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，絕對不要 commit**）。
+撤銷或重新申請：https://hackmd.io/settings#api
+
+轉換時會自動處理：
+
+| HackMD 的寫法 | 轉成什麼 | 為什麼 |
+|---------------|----------|--------|
+| 開頭的 `# 標題` | 移除 | 跟 front-matter 的 title 重複，Hexo 會另外顯示標題 |
+| `[TOC]` | 移除 | Fluid 自己會產生目錄 |
+| `:::spoiler 標題` | `{% fold %}` | Fluid 的摺疊區塊 |
+| `:::info` / `:::warning` 等 | `{% note %}` | Fluid 的提示框 |
+| 數學式裡的 `{{` | `{ {` | 不然 Nunjucks 會讓 build 失敗（見「已知的坑」） |
+
+**含程式碼區塊的 `:::` 容器會退回轉成引言**，因為 Fluid 的 `note` / `fold` 標籤
+會把渲染後的換行壓成空白（見 `node_modules/hexo-theme-fluid/scripts/tags/note.js`），
+程式碼放進去會整段擠成一行。
+
+匯入後每篇會多一個 `hackmd_id` front-matter 欄位，用來對照來源、避免重複匯入。
+
+### 匯入後要人工確認的事
+
+- **圖片仍指向 HackMD / imgur 的外部網址**，原始檔被刪掉就會失效。
+  要落地的話得自己下載到 `source/images/` 再改連結。
+- **沒標語言的程式碼區塊不會上色**，想上色要自己補上 ` ```cpp ` 之類的標記。
+  （HackMD 的 ` ```cpp=1 ` 這種行號語法 Hexo 看得懂，不用改。）
+- `tags` 和 `categories` 匯入後是空的，要自己補。
+
 ## 部署
 
 ### 流程

@@ -12,6 +12,11 @@ _multiconfig.yml
 # 依賴（用 package-lock.json 還原，CI 會自己跑 npm ci）
 node_modules/
 
+# 機密資訊（HackMD API token 等）— 絕對不要進版控
+.env
+.env.*
+!.env.example
+
 # 編輯器暫存檔
 *.swp
 *.swo
