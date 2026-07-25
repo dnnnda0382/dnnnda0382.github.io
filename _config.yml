@@ -13,8 +13,9 @@ timezone: Asia/Taipei
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-## ⚠️ 部署前請把 YOUR-GITHUB-USERNAME 換成你的 GitHub 帳號（見 CLAUDE.md「部署」章節）
-url: https://YOUR-GITHUB-USERNAME.github.io
+## repo 名稱為 dnnnda0382.github.io，網站掛在網域根目錄，所以 root 維持 /
+url: https://dnnnda0382.github.io
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
