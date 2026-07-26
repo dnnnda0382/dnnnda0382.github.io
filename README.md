@@ -339,6 +339,7 @@ npm run rebuild               # clean + build
 
 ## 參考連結
 
+- [指令筆記](docs/commands.md) — 架站過程用過的指令整理,附「當時為什麼要下它」
 - [Hexo 官方文件](https://hexo.io/zh-tw/docs/)
 - [Fluid 主題文件](https://hexo.fluid-dev.com/docs/) — 所有可設定的選項
 - [Hexo 外掛列表](https://hexo.io/plugins/) — 想加功能先來這找
