@@ -180,13 +180,66 @@ cd ~/homepage && git add -A && git commit -m "post: 標題" && git push         
 |----------|----------|--------|
 | 改網站標題 | `_config.yml`<br>`_config.fluid.yml` | `title:`<br>`navbar.blog_title` (兩個都要改) |
 | 改首頁那句標語 | `_config.fluid.yml` | `index.slogan.text` |
-| 改首頁大圖 | `_config.fluid.yml` | `index.banner_img`(圖放 `source/img/`) |
+| 換網站上的圖片 | `_config.fluid.yml` | 見下方(橫幅、favicon、頭像) |
 | 改程式碼配色 | `_config.fluid.yml` | `code.highlight.prismjs.style` / `style_dark` |
 | 微調任何樣式 | `source/css/custom.css` | 直接寫 CSS |
 | 改文章網址格式 | `_config.yml` | `permalink:` |
 | 改關於頁 | `source/about/index.md` | 直接寫 Markdown |
 | 加留言系統 | `_config.fluid.yml` | 見下方 |
 | 搬 HackMD 筆記 | — | 見下方 |
+
+### 換網站上的圖片
+
+網站上的圖**目前一張都不是你的** —— 全是 Fluid 主題自帶的預設檔,放在
+`node_modules/hexo-theme-fluid/source/img/`(那個資料夾**不要去改**,`npm install` 會蓋掉)。
+
+| 你看到的東西 | 主題預設檔 | 要設定的項目(`_config.fluid.yml`) |
+|---|---|---|
+| **每一頁頂端的大橫幅** | `default.png` | `index` / `archive` / `category` / `tag` / `about` / `page` / `links` / `post` 底下各自的 `banner_img` |
+| 瀏覽器分頁的小圖示 | `fluid.png` | `favicon`、`apple_touch_icon`(最上層,不在任何區塊底下) |
+| 關於頁的頭像 | `avatar.png` | `about.avatar` |
+| 圖片載入中的動畫 | `loading.gif` | `lazyload.loading_img` |
+
+橫幅看起來只有一張,但**設定項有八個** —— 每種頁面各自獨立。只改 `index.banner_img`
+的話,就只有首頁會變,點進文章還是舊的那張。
+
+作法:
+
+1. 圖放進 `source/img/`(這個資料夾現在還不存在,自己建)。
+   **檔名不要取跟主題一樣的**(`default.png` / `avatar.png` 等),用 `banner.jpg` 這種自己的名字,
+   免得之後搞不清楚哪張是哪張。
+2. 在 `_config.fluid.yml` 填路徑:
+
+   ```yaml
+   favicon: /img/favicon.png
+   apple_touch_icon: /img/favicon.png
+
+   index:
+     banner_img: /img/banner.jpg
+   archive:
+     banner_img: /img/banner.jpg
+   category:
+     banner_img: /img/banner.jpg
+   tag:
+     banner_img: /img/banner.jpg
+   page:
+     banner_img: /img/banner.jpg
+   post:
+     banner_img: /img/banner.jpg
+   about:
+     banner_img: /img/banner.jpg
+     avatar: /img/avatar.jpg
+   ```
+
+   路徑開頭的 `/` 指的是 **`source/`**,不是電腦的根目錄。
+3. `npm run server` 確認圖有出來再 commit。
+
+橫幅高度也可以一起調,單位是 vh(螢幕高度的百分比),例如 `index.banner_img_height: 100`
+就是滿版。
+
+> 順帶一提,**文章內文的圖片**是另一回事 —— 那些寫在 `.md` 裡的 `![](網址)`,
+> 跟主題設定無關。從 HackMD 匯進來的文章,圖片還指向 `hackmd.io` 的外部網址,
+> 原檔一刪就會破圖。要落地的話得自己下載到 `source/img/` 再把連結改成 `/img/檔名.png`。
 
 ### 加留言系統(giscus)
 
