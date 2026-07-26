@@ -26,6 +26,40 @@
   padding: 0.5em 0;
 }
 
+/* 行內暴雷遮蔽 ||...||（規則在 scripts/markdown-it-spoiler.js）
+   點一下或用鍵盤 Tab 選到才顯示，靠 :focus 做到，不需要 JS。 */
+.markdown-body .spoiler {
+  background-color: #2f3640;
+  border-radius: 3px;
+  padding: 0 0.25em;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 未展開：連同裡面的粗體、公式、連結一起變透明，只剩一條色塊 */
+.markdown-body .spoiler:not(:focus):not(:focus-within),
+.markdown-body .spoiler:not(:focus):not(:focus-within) * {
+  color: transparent !important;
+  /* 避免不小心拖曳選取就看到答案 */
+  user-select: none;
+}
+
+/* 圖片不吃 color，另外蓋掉 */
+.markdown-body .spoiler:not(:focus):not(:focus-within) img {
+  opacity: 0;
+}
+
+.markdown-body .spoiler:focus,
+.markdown-body .spoiler:focus-within {
+  background-color: rgba(128, 128, 128, 0.18);
+}
+
+/* 深色模式下文字是淺色的，遮罩也要跟著換成淺色才看得出是被蓋住 */
+[data-user-color-scheme="dark"] .markdown-body .spoiler {
+  background-color: #c8ccd4;
+}
+
 /* 表格在窄螢幕也能捲動 */
 .markdown-body .table-wrapper,
 .markdown-body table {

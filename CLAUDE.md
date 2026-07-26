@@ -83,13 +83,16 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 │   ├── _drafts/             # ← 私人草稿庫（獨立 private repo，不進版控）
 │   ├── about/index.md       # 關於頁
 │   └── css/custom.css       # ← 自訂樣式覆寫
+├── scripts/                 # ← Hexo 外掛（會被自動載入，不是一般腳本）
+│   └── markdown-it-spoiler.js  # ||暴雷|| 行內語法
 ├── tools/new-post.sh        # npm run new 背後的腳本
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
 └── .github/workflows/deploy.yml  # 自動部署
 ```
 
-`scripts/` 這個資料夾名稱被 Hexo 佔用了（Hexo 會把裡面的 `.js` 當外掛自動載入），
-所以自己寫的工具腳本一律放 `tools/`。
+`scripts/` 這個資料夾名稱被 Hexo 佔用了 —— Hexo 會把裡面的 `.js` 當**外掛**自動載入。
+所以那裡只放真的要當外掛跑的東西（目前是 `markdown-it-spoiler.js`），
+自己寫的工具腳本一律放 `tools/`。
 
 ---
 
@@ -260,6 +263,9 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 | `:::info` / `:::warning` 等 | `{% note %}` | Fluid 的提示框 |
 | 數學式裡的 `{{` | `{ {` | 不然 Nunjucks 會讓 build 失敗（見「已知的坑」） |
 
+行內的 `||暴雷內容||` **不需要轉換**，原樣留著就好 —— 由
+`scripts/markdown-it-spoiler.js` 在渲染階段處理（見下方「行內暴雷語法」）。
+
 **含程式碼區塊的 `:::` 容器會退回轉成引言**，因為 Fluid 的 `note` / `fold` 標籤
 會把渲染後的換行壓成空白（見 `node_modules/hexo-theme-fluid/scripts/tags/note.js`），
 程式碼放進去會整段擠成一行。
@@ -273,6 +279,35 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 - **沒標語言的程式碼區塊不會上色**，想上色要自己補上 ` ```cpp ` 之類的標記。
   （HackMD 的 ` ```cpp=1 ` 這種行號語法 Hexo 看得懂，不用改。）
 - `tags` 和 `categories` 匯入後是空的，要自己補。
+
+## 行內暴雷語法 `||...||`
+
+HackMD 的行內暴雷語法，markdown-it 沒有內建，由 `scripts/markdown-it-spoiler.js`
+補上。渲染成 `<span class="spoiler" tabindex="0">`，樣式在 `source/css/custom.css`，
+點一下或用鍵盤 Tab 選到才顯示 —— 靠 CSS 的 `:focus`，不需要 JS。
+
+改這塊之前要知道的三件事：
+
+**1. 不能改用 npm 上的 spoiler 外掛。** `markdown-it-spoiler`、`@mdit/plugin-spoiler`
+之類的套件用的都是 `!!暴雷!!` 語法，不是 `||暴雷||`。換過去等於要把所有筆記裡的
+`||` 全部改寫，而且從 HackMD 貼過來的新筆記又會再壞一次。
+
+**2. 為什麼要包住 markdown-it 的 `text` 規則。** markdown-it 的 `text` 規則會一路吃掉
+普通字元，只在「終止字元」前停手，而 `|` **刻意不在那份清單裡**（見
+`node_modules/markdown-it/lib/rules_inline/text.mjs`）。所以光是註冊一條行內規則沒有用
+—— tokenizer 根本不會在句子中間的 `||` 停下來給它機會。外掛的作法是包住原本的 `text`
+規則，吃完發現裡面有 `||` 就把多吃的吐回去。
+
+不要改成「複製一份終止字元清單再加上 `|`」，那樣 markdown-it 一升版就可能失準。
+
+**3. 掛載走 filter，不是 `markdown.plugins`。** 根目錄 `_config.yml` 的
+`markdown.plugins` 只吃得下 npm 套件名稱，本機檔案塞不進去。改用
+`hexo-renderer-markdown-it` 提供的 `markdown-it:renderer` filter
+（見 `node_modules/hexo-renderer-markdown-it/lib/renderer.js` 的 `render()`）。
+那個 filter 每次 render 都會被呼叫，所以外掛裡有一個旗標擋重複註冊。
+
+不會被誤判的情況（已驗證）：行內程式碼 `` `a || b` ``、``` ``` ``` 圍起來的 C++ 程式碼區塊、
+數學式裡的 `$\|x\|_2$`、表格的 `|` 分隔線。`||` 沒有收尾或內容是空的 `||||` 也會原樣印出。
 
 ## 部署
 
