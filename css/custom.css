@@ -55,16 +55,18 @@
   background-color: rgba(128, 128, 128, 0.18);
 }
 
-/* 深色模式下文字是淺色的，遮罩也要跟著換成淺色才看得出是被蓋住 */
+/* 深色模式下文字是淺色的，遮罩也要跟著換成淺色才看得出是被蓋住。
+   色相跟 _config.fluid.yml 的深色底色一組（330° 那側的洋紅），原本的
+   #c8ccd4 是藍灰色，在酒紅色的底上會跳出來。 */
 [data-user-color-scheme="dark"] .markdown-body .spoiler {
-  background-color: #c8ccd4;
+  background-color: #c0a5b5;
 }
 
 /* 展開後要把上面那層淺色遮罩換掉，不然淺底配深色模式的淺色文字會看不見。
    權重要壓過上一條規則（同為 0,3,0 但寫在後面），所以連 dark 選擇器一起寫。 */
 [data-user-color-scheme="dark"] .markdown-body .spoiler:focus,
 [data-user-color-scheme="dark"] .markdown-body .spoiler:focus-within {
-  background-color: rgba(200, 204, 212, 0.18);
+  background-color: rgba(192, 165, 181, 0.18);
 }
 
 /* 表格在窄螢幕也能捲動 */
