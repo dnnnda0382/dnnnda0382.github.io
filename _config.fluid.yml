@@ -13,6 +13,11 @@
 # 瀏覽器分頁標題分隔符
 tab_title_separator: " | "
 
+# 網站圖示（瀏覽器分頁 / 加到 iOS 主畫面時用的圖）
+# 圖片放在 source/img/，路徑從網站根目錄算起
+favicon: /img/icon.png
+apple_touch_icon: /img/icon.png
+
 # 程式碼區塊
 code:
   # 顯示語言標籤（右上角顯示 CPP / PYTHON 等）
@@ -40,6 +45,62 @@ dark_mode:
   enable: true
   default: auto  # 跟隨系統設定
 
+# 配色
+# ------------------------------------------------------------------
+# 主題預設是藍灰色系（body #eee、導覽列 #2f4154、連結 #0366d6、hover #30a9de），
+# 跟頭圖的紅／橘／深紫夜空對不起來，藍色連結尤其突兀。
+#
+# 這裡換成從頭圖取樣的色系：
+#   洋紅 #b03a50（洋裝）、爆裂橘 #c8442a、深酒紅 #4a2130
+#
+# 深色模式的所有中性色（底色、卡片、導覽列、分隔線、捲軸）色相統一在 330°，
+# 也就是洋紅／酒紅那一側。原本是 268-275°（偏藍的紫），偏冷、跟頭圖搭不起來。
+# 轉色相時 L 維持不變，對比才不會跑掉；深色在洋紅色相下彩度感較弱，底色和
+# 導覽列各補了 3-4% 的飽和度。
+# 底色不直接用飽和色 —— 大面積的紅會很吵而且傷眼，改成「帶玫瑰調的暖中性色」，
+# 讓彩度集中在連結、hover 這些小面積的地方。
+#
+# 所有前景／背景組合都驗算過 WCAG AA（對比 ≥ 4.5:1），最低的是淺色模式的
+# 次要文字 4.51。改任何一個顏色之前記得重算，不然會有人讀不到字。
+color:
+  # 頁面底色 / 卡片底色
+  body_bg_color: "#f3ece9"
+  body_bg_color_dark: "#21121a"
+  board_color: "#fffcfb"
+  board_color_dark: "#2c1923"
+
+  # 導覽列
+  navbar_bg_color: "#4a2130"
+  navbar_bg_color_dark: "#27141e"
+
+  # 內文
+  text_color: "#4a3b3f"
+  text_color_dark: "#ccc2c7"
+  sec_text_color: "#7d666c"
+  sec_text_color_dark: "#a2949b"
+  post_text_color: "#3b2f33"
+  post_text_color_dark: "#ccc2c7"
+  post_heading_color: "#2a1e28"
+  post_heading_color_dark: "#e8dfe3"
+
+  # 連結（原本是 GitHub 藍 + 天藍 hover，是最不搭的兩個顏色）
+  post_link_color: "#b03a50"
+  post_link_color_dark: "#e8798c"
+  link_hover_color: "#c8442a"
+  link_hover_color_dark: "#f08a4b"
+  link_hover_bg_color: "#f7ece9"
+  link_hover_bg_color_dark: "#3d2531"
+
+  # 分隔線、捲軸、按鈕
+  line_color: "#ecdfdb"
+  line_color_dark: "#472f3b"
+  scrollbar_color: "#c9b3b3"
+  scrollbar_color_dark: "#6f5663"
+  scrollbar_hover_color: "#a88c8c"
+  scrollbar_hover_color_dark: "#8f7381"
+  button_hover_bg_color: "#f5e9e6"
+  button_hover_bg_color_dark: "#452b38"
+
 # 導覽列
 navbar:
   blog_title: "DnDA's Notes"
@@ -54,14 +115,23 @@ navbar:
 search:
   enable: true
 
+# 頭圖（各頁面上方的背景圖）
+# ------------------------------------------------------------------
+# 主題的預設值是自帶的 /img/default.png，每個頁面要各自指定，沒設到的頁面
+# 就會留著主題的預設圖，跟首頁對不起來。所以下面每一頁都指定同一張。
+# banner_img_height 是佔螢幕高度的百分比，沿用主題預設值。
+
 # 首頁
 index:
   slogan:
     enable: true
-    text: "用 Markdown 記下所有值得記下的事"
+    text: "人會離去，但故事會留下"
+  banner_img: /img/cover.jpg
 
 # 文章頁
 post:
+  banner_img: /img/cover.jpg
+
   meta:
     # 預估閱讀時間
     # ------------------------------------------------------------------
@@ -96,6 +166,63 @@ post:
   # 文章底部版權宣告
   copyright:
     enable: false
+
+# 歸檔頁
+archive:
+  banner_img: /img/cover.jpg
+
+# 分類頁
+category:
+  banner_img: /img/cover.jpg
+
+# 標籤頁
+tag:
+  banner_img: /img/cover.jpg
+
+# 關於頁
+# ------------------------------------------------------------------
+# ⚠️ 頭像下面那幾行字是設定值，不在 source/about/index.md 裡。
+#    關於頁由上到下的順序是：
+#      avatar（圓形頭像）→ name（大字）→ intro（小字）→ icons（一排圖示）
+#      → 最後才是 source/about/index.md 的正文
+about:
+  banner_img: /img/cover.jpg
+
+  # 頭像，CSS 會裁成圓形（object-fit: cover，取正中央的正方形）
+  avatar: /img/avatar.jpg
+
+  # 頭像正下方的大字
+  name: "DnDA"
+
+  # 大字下面那行小字。留空就不顯示，想寫什麼直接填在引號裡。
+  intro: "還在尋找能讓我沉醉一輩子的事物"
+
+  # 小字下面那排圖示
+  # class 是圖示名稱，完整清單見 https://hexo.fluid-dev.com/docs/icon/
+  # （實際來源是 iconfont 設定的那份 CDN CSS，裡面每個 .icon-xxx 都可以用）
+  # tip 是滑鼠移上去顯示的說明；link 會開新分頁
+  icons:
+    - { class: "iconfont icon-github-fill", link: "https://github.com/dnnnda0382", tip: "GitHub" }
+    - { class: "iconfont icon-mail", link: "mailto:dnnnda0382@gmail.com", tip: "Email" }
+    # Discord：圖示有（icon-discord-fill），但 link 一定要是可以點的網址。
+    # 把下面那行的 # 拿掉，並二選一填進去：
+    #   伺服器邀請  https://discord.gg/xxxxxxx
+    #   個人檔案    https://discord.com/users/<你的 18-19 位數字 user ID>
+    #              （Discord 設定 → 進階 → 開啟開發者模式，再對自己頭像按右鍵複製使用者 ID）
+    # 只想顯示帳號名稱、不想連出去的話，這個主題做不到 —— 圖示一定是超連結。
+    - { class: "iconfont icon-discord-fill", link: "https://discord.com/users/762289288720285746", tip: "Discord" }
+
+# 頁尾
+# ------------------------------------------------------------------
+# 主題預設會放一行「Hexo ❤ Fluid」的推廣連結，設成空字串就不顯示。
+# 這是主題作者的請求（設定檔註解寫「建議保留」），不是授權條款的要求 ——
+# Fluid 是 GPL-3，要求的是散布時保留原始碼裡的授權與著作權聲明，那份
+# LICENSE 檔還原封不動待在 node_modules/hexo-theme-fluid/ 裡。
+#
+# 想放自己的東西的話，這個欄位吃的是原始 HTML，例如：
+#   content: '<span>© 2026 DnDA</span>'
+footer:
+  content: ""
 
 # 自訂樣式覆寫（路徑相對於 source/ 目錄）
 # 要調整外觀請改 source/css/custom.css，不要動 node_modules 裡的主題原始檔
