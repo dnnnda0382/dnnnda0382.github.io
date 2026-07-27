@@ -60,6 +60,13 @@
   background-color: #c8ccd4;
 }
 
+/* 展開後要把上面那層淺色遮罩換掉，不然淺底配深色模式的淺色文字會看不見。
+   權重要壓過上一條規則（同為 0,3,0 但寫在後面），所以連 dark 選擇器一起寫。 */
+[data-user-color-scheme="dark"] .markdown-body .spoiler:focus,
+[data-user-color-scheme="dark"] .markdown-body .spoiler:focus-within {
+  background-color: rgba(200, 204, 212, 0.18);
+}
+
 /* 表格在窄螢幕也能捲動 */
 .markdown-body .table-wrapper,
 .markdown-body table {
