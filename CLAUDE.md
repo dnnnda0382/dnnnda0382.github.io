@@ -86,6 +86,7 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 │   └── css/custom.css       # ← 自訂樣式覆寫
 ├── scripts/                 # ← Hexo 外掛（會被自動載入，不是一般腳本）
 │   ├── markdown-it-spoiler.js     # ||暴雷|| 行內語法
+│   ├── markdown-it-emoji.js       # :smile: 短碼
 │   └── wordcount-skip-katex.js    # 字數統計扣掉 KaTeX 的 MathML 分身
 ├── tools/new-post.sh        # npm run new 背後的腳本
 ├── tools/publish-draft.sh   # npm run draft:publish 背後的腳本
@@ -364,6 +365,32 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 - **沒標語言的程式碼區塊不會上色**，想上色要自己補上 ` ```cpp ` 之類的標記。
   （HackMD 的 ` ```cpp=1 ` 這種行號語法 Hexo 看得懂，不用改。）
 - `tags` 和 `categories` 匯入後是空的，要自己補。
+
+## HackMD 語法在這裡的支援狀況
+
+markdown-it 沒有內建 HackMD 的全部語法。已經確認過的狀況：
+
+| 語法 | 狀況 |
+|------|------|
+| `~~刪除線~~` | ✅ markdown-it 原生支援，不用處理 |
+| `:smile:` emoji 短碼 | ✅ 由 `scripts/markdown-it-emoji.js` 補上 |
+| `\|\|暴雷\|\|` | ✅ 由 `scripts/markdown-it-spoiler.js` 補上（見下一節） |
+| `^上標^` / `~下標~` | ❌ **刻意不支援**，理由見下 |
+
+⚠️ **不要為了上標／下標去裝 `markdown-it-sup` / `markdown-it-sub`。**
+掃過全站文章後，`^...^` 和 `~...~` 的命中幾乎都不是上下標的意思：
+
+```
+@#^%&^&#$^#          ← 被消音的髒話
+10:20~12:20          ← 時間區間
+$O(n\cdot 2^n)$      ← LaTeX，本來就由 KaTeX 處理
+```
+
+裝下去這些全部都會被弄壞。真的要寫上下標就用 `$x^y$` 這種 LaTeX 寫法，
+站上本來就有 KaTeX。
+
+emoji 外掛刻意只開短碼、關掉 ASCII 表情（`:)` `:D` `:/` 那些）的自動轉換，
+理由寫在 `scripts/markdown-it-emoji.js` 的檔頭。
 
 ## 行內暴雷語法 `||...||`
 
