@@ -87,7 +87,9 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 │   ├── markdown-it-spoiler.js     # ||暴雷|| 行內語法
 │   └── wordcount-skip-katex.js    # 字數統計扣掉 KaTeX 的 MathML 分身
 ├── tools/new-post.sh        # npm run new 背後的腳本
+├── tools/publish-draft.sh   # npm run draft:publish 背後的腳本
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
+├── tools/drop-bg.mjs        # 手寫圖去背（產生 logo.png / icon.png）
 └── .github/workflows/deploy.yml  # 自動部署
 ```
 
@@ -241,8 +243,29 @@ git repo，推到使用者的私人 remote。
 ```bash
 npm run draft "標題"          # 建立草稿
 npm run server:draft          # 預覽時包含草稿
+npm run draft:publish         # 不給參數 = 列出所有草稿
 npm run draft:publish "標題"  # 把草稿移到 _posts（等於決定要公開了）
 ```
+
+`draft:publish` 走的是 `tools/publish-draft.sh`，**不是 `hexo publish`**。
+
+`hexo publish` 會先把參數丟進 `slugize()` 再比對 `_drafts/` 的檔名開頭（見
+`node_modules/hexo/dist/hexo/post.js` 的 `publish()`），而 slugize 會把空格換成
+dash，所以**檔名帶空格的草稿永遠比對不到**：
+
+```
+slugize("114-1 台大資工大一上修課心得") → "114-1-台大資工大一上修課心得"
+實際檔名                                 → "114-1 台大資工大一上修課心得.md"
+```
+
+換句話說 `hexo publish` 只找得到 `hexo new draft` 建的草稿（那些建檔時就
+slugify 過了）。從 HackMD 匯進來的檔名一律保留原標題的空格（見
+`tools/import-hackmd.mjs` 的 `safeFilename()`），全部中不了。
+
+自己寫的腳本改成直接比對檔名、不做 slugify，另外支援：忽略大小寫、部分比對、
+命中多筆時列出候選、目標已存在時拒絕覆蓋，以及**發布前的 y/N 確認**（因為搬進
+`_posts` 再 push 就收不回來了，見上面的事故記錄）。非互動式環境會直接拒絕，
+要在腳本裡跑請加 `PUBLISH_YES=1`。
 
 ## 從 HackMD 匯入舊筆記
 

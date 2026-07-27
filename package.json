@@ -5,7 +5,7 @@
   "scripts": {
     "new": "bash tools/new-post.sh",
     "draft": "hexo new draft",
-    "draft:publish": "hexo publish",
+    "draft:publish": "tools/publish-draft.sh",
     "server": "hexo server",
     "server:draft": "hexo server --draft",
     "build": "hexo generate",
