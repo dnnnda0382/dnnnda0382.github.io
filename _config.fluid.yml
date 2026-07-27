@@ -212,6 +212,27 @@ about:
     # 只想顯示帳號名稱、不想連出去的話，這個主題做不到 —— 圖示一定是超連結。
     - { class: "iconfont icon-discord-fill", link: "https://discord.com/users/762289288720285746", tip: "Discord" }
 
+# 分享預覽（Open Graph）
+# ------------------------------------------------------------------
+# 貼連結到 Discord / LINE / Twitter 時顯示的那張卡片。
+#
+# 不設 image 的話，Hexo 的 open_graph helper 會去掃文章內容裡的 <img>，把找到的
+# 每一張都塞成 og:image（見 node_modules/hexo/dist/plugins/helper/open_graph.js
+# 第 77 行）。結果是：
+#   - 首頁沒有任何圖片 → 完全沒有 og:image，卡片變成光禿禿的純文字
+#   - 匯入的文章 → 抓到一堆 hackmd.io/_uploads/... 的外部網址，HackMD 那邊
+#     的圖被刪掉預覽就壞了
+#
+# 設了之後 images 陣列非空，那段掃描就不會執行。填相對路徑即可，helper 會用
+# new URL(path, config.url) 補成絕對網址。
+#
+# ⚠️ Fluid 是用 Object.assign({ image: page.og_img || page.index_img }, theme.open_graph)
+#    合併的（layout/_partials/head.ejs），theme 設定在後面會蓋掉 page 的值。
+#    所以這裡一設，全站每一頁都用同一張圖，個別文章的 index_img 會失效。
+#    之後如果想讓某篇文章用自己的預覽圖，得把這行拿掉、改成每篇設 index_img。
+open_graph:
+  image: /img/cover.jpg
+
 # 頁尾
 # ------------------------------------------------------------------
 # 主題預設會放一行「Hexo ❤ Fluid」的推廣連結，設成空字串就不顯示。

@@ -19,7 +19,10 @@ root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
-  trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
+  # false = 產生的連結不帶 index.html。純粹是好看，檔案本身還是 index.html，
+  # GitHub Pages 收到 /foo/ 一樣會回 /foo/index.html，舊連結不會壞。
+  # 主要是讓 og:url 和 canonical 不要出現 .../index.html 這種尾巴。
+  trailing_index: false
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
 
 # Directory
