@@ -93,8 +93,35 @@ echo "準備發布："
 echo "  來源  $SRC"
 echo "  目標  $DEST"
 echo
-grep -m1 '^tags:' "$SRC" | sed 's/^/  /' || true
-grep -m1 '^categories:' "$SRC" | sed 's/^/  /' || true
+
+# front-matter 檢查
+# ------------------------------------------------------------------
+# 用 node 讀而不是 grep —— YAML 的寫法太多（[a, b] / 條列式 / 引號有無），
+# grep 判斷不準。hexo-front-matter 是 Hexo 自己在用的 parser，跟 build 時
+# 看到的結果一致。
+node -e '
+const fm = require("hexo-front-matter");
+const fs = require("fs");
+const d = fm.parse(fs.readFileSync(process.argv[1], "utf8"));
+const missing = [];
+const show = v => Array.isArray(v) ? `[${v.join(", ")}]` : String(v);
+const check = (key, label, hint) => {
+  const v = d[key];
+  const empty = v == null || (Array.isArray(v) && v.length === 0) || String(v).trim() === "";
+  if (empty) { missing.push(label); console.log(`  ✗ ${key.padEnd(12)}缺少 —— ${hint}`); }
+  else console.log(`  ✓ ${key.padEnd(12)}${show(v)}`);
+};
+console.log("front-matter 檢查：");
+check("tags", "tags", "標籤頁不會收錄這篇");
+check("categories", "categories", "分類頁不會收錄這篇");
+check("description", "description", "分享連結時預覽會抓內文前 200 字，通常會斷在半句話");
+if (missing.length) {
+  console.log("");
+  console.log(`⚠️  有 ${missing.length} 個欄位沒填：${missing.join("、")}`);
+  console.log("   照樣可以發布，之後補上再 push 也會生效（不影響網址）。");
+}
+' "$SRC"
+
 echo
 echo "⚠️  發布後 push 出去，內容就會進入公開 repo，實務上收不回來。"
 

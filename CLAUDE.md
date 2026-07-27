@@ -178,13 +178,22 @@ title: 文章標題
 date: 2026-07-25 16:21:21
 tags: []
 categories: []
+description: ''
 ---
 ```
 
 規則：
 
 - **title**：中文標題直接寫，不用加引號（除非標題裡有 `:` 或開頭是特殊字元）。
+  改 title **不會**影響網址（網址的 `:title` 取自檔名，不是這個欄位）。
 - **date**：`npm run new` 會自動填當下時間，通常不用改。
+  ⚠️ 改 date **會改掉網址**（permalink 是 `:year/:month/:day/:title/`），舊連結會壞。
+  檔名同理。內容、title、tags 怎麼改都不影響網址。
+- **description**：分享連結時預覽卡片顯示的那段文字，**請務必填**。
+  不填的話 Fluid 會退而取內文的前 200 字（見
+  `node_modules/hexo-theme-fluid/layout/_partials/head.ejs` 開頭那段
+  `page.description || page.excerpt || (is_post() && page.content) || config.description`），
+  結果是標題和內文擠在一起、句子斷在半路。通常複製第一段貼進來就夠了。
 - **tags**：陣列，可以多個 → `tags: [演算法, C++]`
 - **categories**：陣列，**通常只填一個**。Hexo 的 categories 寫多個會被當成
   階層關係（`[數學, 線性代數]` 代表「數學 > 線性代數」的子分類），不是並列。
@@ -200,9 +209,42 @@ categories: []
 
 ```
 數學  演算法  資料結構  C++  Python  筆記  雜記  測試
+修課心得  GPA  競程  APCS
 ```
 
-分類目前用：`筆記`、`雜記`。
+分類目前用：`筆記`、`雜記`、`心得`。
+
+`npm run draft:publish` 在發布前會檢查 `tags` / `categories` / `description`
+有沒有填，缺的會列出來提醒（但不會擋，只是提醒）。這三個欄位事後補上再 push
+都會生效，不影響網址。
+
+---
+
+## 分享預覽（Open Graph）
+
+貼連結到 Discord / LINE / Twitter 時顯示的卡片，由 `<meta property="og:*">` 決定。
+
+| 卡片上的東西 | 來源 |
+|---|---|
+| 標題 | 文章的 `title`（首頁是 `_config.yml` 的 `title`） |
+| 說明文字 | 文章的 **`description`** ← 沒填就退而抓內文前 200 字 |
+| 圖片 | `_config.fluid.yml` 的 `open_graph.image` |
+
+**`open_graph.image` 一定要設。** 沒設的話 Hexo 會去掃文章內容裡的 `<img>` 當
+預覽圖（見 `node_modules/hexo/dist/plugins/helper/open_graph.js` 第 77 行附近），
+造成兩個問題：首頁沒有任何圖片就完全沒有 `og:image`，卡片變成光禿禿的純文字；
+而從 HackMD 匯入的文章會抓到 `hackmd.io/_uploads/...` 的外部網址，對方刪檔預覽就壞。
+
+⚠️ Fluid 是用 `Object.assign({ image: page.og_img || page.index_img }, theme.open_graph)`
+合併的，**theme 的設定會蓋掉個別文章的 `index_img`**，所以目前全站共用同一張。
+之後想讓某篇用自己的預覽圖，得把 `open_graph.image` 拿掉、改成每篇設 `index_img`。
+
+改完要驗證的話直接檢查產出的 HTML：
+
+```bash
+npm run build
+grep -oE '<meta property="og:[a-z:]+"[^>]*>' public/index.html
+```
 
 ---
 
