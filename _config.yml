@@ -3,11 +3,36 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
+# ------------------------------------------------------------------
+# 站台基本資訊。改這一段之前先看清楚每個欄位實際用在哪裡 —— 有些會出現在
+# 分享連結的預覽卡片上，有些其實根本沒被用到。
+
+# 瀏覽器分頁標題、分享卡片的標題。
+# 導覽列左上角雖然被手寫 logo 圖蓋掉了（見 source/css/custom.css），
+# 但那個 <strong> 裡的文字仍然是這個值，螢幕閱讀器和搜尋引擎讀的是它。
 title: DnDA's Notes
+
+# ⚠️ 目前沒有作用。
+# 它只是 _config.fluid.yml 裡 index.slogan.text 的備援值
+# （見 node_modules/hexo-theme-fluid/layout/index.ejs 第 3 行：
+#  page.subtitle = theme.index.slogan.text || config.subtitle || ''），
+# 而 slogan 已經設了「人會離去，但故事會留下」，所以這行永遠輪不到。
+# 留著是為了之後若把 slogan 關掉，這裡就會自動生效。
 subtitle: '筆記與雜記'
-description: '數學、程式與學習筆記'
+
+# 首頁的分享預覽說明文字（<meta name="description"> 和 og:description）。
+# 貼首頁連結到 Discord / LINE 時，卡片上顯示的就是這一句。
+# 個別文章不吃這個值，走各自 front-matter 的 description（見 CLAUDE.md）。
+description: "DnDA's blog"
+
+# 產生 <meta name="keywords">。留空即可 —— Google 從 2009 年就宣告不採用
+# 這個欄位做排名了，填了也沒有效果。
 keywords:
+
+# <meta name="author">
 author: DnDA
+
+# 影響日期顯示格式和 og:locale，別改。
 language: zh-TW
 timezone: Asia/Taipei
 
@@ -16,6 +41,10 @@ timezone: Asia/Taipei
 ## repo 名稱為 dnnnda0382.github.io，網站掛在網域根目錄，所以 root 維持 /
 url: https://dnnnda0382.github.io
 root: /
+# 文章網址的格式。
+# ⚠️ 改這個會讓「全站既有連結」一次失效，除非確定沒人連過，否則別動。
+#    其中 :title 取自「檔名」，不是 front-matter 的 title —— 所以改標題不會
+#    動到網址，改檔名或 date 才會。
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -105,6 +134,9 @@ meta_generator: true
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 ## updated_option supports 'mtime', 'date', 'empty'
+## mtime = 用「檔案的修改時間」當更新時間。代價是改個錯字、甚至只是重新存檔，
+##         那篇的更新時間就會跳動。
+## date  = 更新時間永遠等於發布時間，不會因為小修改而變動。
 updated_option: 'mtime'
 
 # Pagination
