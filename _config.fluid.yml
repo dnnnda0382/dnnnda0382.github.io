@@ -62,6 +62,19 @@ index:
 
 # 文章頁
 post:
+  meta:
+    # 預估閱讀時間
+    # ------------------------------------------------------------------
+    # 每分鐘字數 = awl × wpm。主題預設 2 × 60 = 120 字/分鐘，對中文來說太慢，
+    # 這裡改成 2 × 150 = 300 字/分鐘。
+    #
+    # 「字數」實際上是去掉 HTML 標籤和空白後的「字元數」
+    # （見 node_modules/hexo-theme-fluid/scripts/helpers/wordcount.js），
+    # 計算前會先由 scripts/wordcount-skip-katex.js 扣掉 KaTeX 的 MathML 分身。
+    min2read:
+      awl: 2
+      wpm: 150
+
   # 數學公式
   # ------------------------------------------------------------------
   # 這裡設 katex 只會載入 KaTeX 的「CSS」，不會載入 auto-render JS。

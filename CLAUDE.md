@@ -84,15 +84,20 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 │   ├── about/index.md       # 關於頁
 │   └── css/custom.css       # ← 自訂樣式覆寫
 ├── scripts/                 # ← Hexo 外掛（會被自動載入，不是一般腳本）
-│   └── markdown-it-spoiler.js  # ||暴雷|| 行內語法
+│   ├── markdown-it-spoiler.js     # ||暴雷|| 行內語法
+│   └── wordcount-skip-katex.js    # 字數統計扣掉 KaTeX 的 MathML 分身
 ├── tools/new-post.sh        # npm run new 背後的腳本
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
 └── .github/workflows/deploy.yml  # 自動部署
 ```
 
 `scripts/` 這個資料夾名稱被 Hexo 佔用了 —— Hexo 會把裡面的 `.js` 當**外掛**自動載入。
-所以那裡只放真的要當外掛跑的東西（目前是 `markdown-it-spoiler.js`），
-自己寫的工具腳本一律放 `tools/`。
+所以那裡只放真的要當外掛跑的東西，自己寫的工具腳本一律放 `tools/`。
+
+⚠️ Hexo 是用 bluebird 的併發 `.map` 同時載入主題的 `scripts/` 和這裡的 `scripts/`
+（見 `node_modules/hexo/dist/hexo/load_plugins.js` 的 `loadScripts`），**先後順序不保證**。
+要覆寫主題註冊的東西（helper、filter 等），請掛在 `after_init` filter 裡註冊，
+那個時間點所有外掛都載完了 —— `wordcount-skip-katex.js` 就是這樣做的。
 
 ---
 
