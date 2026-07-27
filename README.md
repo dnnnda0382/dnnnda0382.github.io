@@ -35,7 +35,7 @@ npm run server      # 開 http://localhost:4000,存檔會自動重新整理
 
 ### 文章開頭的 front-matter
 
-`npm run new` 會自動產生這段,把 `tags` 和 `categories` 填一填就好:
+`npm run new` 會自動產生這段,把 `tags`、`categories`、`description` 填一填就好:
 
 ```yaml
 ---
@@ -43,6 +43,7 @@ title: 線性代數筆記
 date: 2026-07-25 16:21:21
 tags: [數學, 筆記]
 categories: [筆記]
+description: '用高中生看得懂的方式重新整理線性代數的核心概念。'
 ---
 
 這段會出現在首頁當摘要。
@@ -53,6 +54,20 @@ categories: [筆記]
 ```
 
 `categories` 通常只填一個。填兩個以上會被當成階層(`[數學, 線性代數]` = 「數學 > 線性代數」),不是並列。
+
+`description` 是**把連結貼到 Discord / LINE 時,預覽卡片上顯示的那段字**,也會當成
+首頁列表的摘要。不填的話系統會退而抓內文前 200 字,結果通常是標題和內文擠在一起、
+句子斷在半句話。通常複製第一段貼進來就夠了。
+
+想知道哪幾篇還沒填,跑:
+
+```bash
+npm run check              # 盤點 source/_posts 缺哪些欄位
+npm run check -- --drafts  # 改看草稿
+```
+
+`npm run draft:publish` 在發布前也會自動提醒缺什麼。這三個欄位事後補上再 push 都會
+生效,**不影響網址**——會改到網址的只有「檔名」和「date」。
 
 ### 藏答案 / 暴雷遮蔽
 
@@ -382,10 +397,23 @@ lsof -ti:4000 | xargs kill
 ├── _config.yml             ← 網站基本設定
 ├── _config.fluid.yml       ← 外觀/主題設定
 ├── .env                    ← HackMD token(不進版控)
-├── tools/                  ← 工具腳本
+├── source/images/          ← 文章內文用的圖片
+├── tools/                  ← 工具腳本（見下）
+├── scripts/                ← Hexo 外掛，Hexo 會自動載入（不是一般腳本）
 ├── CLAUDE.md               ← 給 Claude Code 的專案規範
 └── README.md               ← 這份
 ```
+
+`tools/` 裡面有:
+
+| 檔案 | 用途 |
+|------|------|
+| `new-post.sh` | `npm run new` 背後的腳本 |
+| `publish-draft.sh` | `npm run draft:publish` 背後的腳本 |
+| `check-frontmatter.mjs` | `npm run check`,也被 publish-draft 呼叫 |
+| `import-hackmd.mjs` | 從 HackMD 匯入筆記 |
+| `localize-images.mjs` | 把文章裡的外部圖片抓回 `source/images/` |
+| `drop-bg.mjs` | 手寫圖去背（產生 logo.png / icon.png）|
 
 **不要動的東西**:`node_modules/`(套件)、`public/`(build 產物)、`db.json`(快取)。這三個都不進版控,砍掉重跑 `npm install` / `npm run build` 就會回來。
 
@@ -396,7 +424,9 @@ lsof -ti:4000 | xargs kill
 ```bash
 npm run new "標題"            # 新增文章（直接進 _posts，會發布）
 npm run draft "標題"          # 新增草稿（進 _drafts，私密不發布）
-npm run draft:publish "標題"  # 草稿 → 文章
+npm run draft:publish         # 不給參數 = 列出所有草稿
+npm run draft:publish "標題"  # 草稿 → 文章（發布前會確認並提醒缺的欄位）
+npm run check                 # 盤點文章缺哪些 front-matter 欄位
 npm run server                # 本機預覽 (localhost:4000)
 npm run server:draft          # 本機預覽，含草稿
 npm run build                 # 產生靜態檔到 public/
