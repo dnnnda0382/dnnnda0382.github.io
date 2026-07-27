@@ -263,6 +263,22 @@ npm run build
 grep -oE '<meta property="og:[a-z:]+"[^>]*>' public/index.html
 ```
 
+### RSS 與 sitemap
+
+`hexo-generator-feed` 產生 `/atom.xml`，`hexo-generator-sitemap` 產生
+`/sitemap.xml`，設定都在根目錄 `_config.yml`。
+
+RSS 的每篇摘要取用順序是 `post.description` → `post.excerpt` → 內文前
+`content_limit` 字（見 `node_modules/hexo-generator-feed/lib/generator.js`
+第 54 行），所以**文章的 `description` 沒填的話，RSS 的摘要也會很難看**。
+
+⚠️ RSS 整體的說明文字取的是 `config.subtitle || config.description`（同檔案
+第 33 行）—— **`subtitle` 有值就輪不到 `description`**。所以改站台說明時，
+要記得這兩個欄位餵的是不同地方：`description` 給網頁的分享卡片，
+`subtitle` 給 RSS。
+
+`published: false` 的文章不會進 feed 也不會進 sitemap，已驗證。
+
 ---
 
 ## 私人草稿庫（重要）

@@ -308,7 +308,7 @@ npx hexo version            # 版本與環境資訊
 npx hexo new "標題"         # 新文章 → source/_posts/
 npx hexo new page about     # 新頁面 → source/about/
 npx hexo new draft "標題"   # 新草稿 → source/_drafts/
-npx hexo publish "標題"     # 草稿 → 文章（移動檔案）
+npx hexo publish "標題"     # ⚠️ 這個在本專案用不了，見下方「坑 6」
 npx hexo server             # 本機預覽
 npx hexo server -p 5000     # 指定 port
 npx hexo server --draft     # 預覽時也顯示草稿
@@ -322,12 +322,25 @@ npx hexo clean              # 清掉 public/ 和快取 db.json
 ```bash
 npm run new "標題"
 npm run draft "標題"
-npm run draft:publish "標題"
+npm run draft:publish            # 不給參數 = 列出所有草稿
+npm run draft:publish "標題"     # 發布前會 y/N 確認，並提醒缺的 front-matter 欄位
+npm run check                    # 盤點文章缺哪些 front-matter 欄位
+npm run check -- --drafts        # 改看草稿
 npm run server
 npm run server:draft
 npm run build
 npm run clean
 npm run rebuild          # = clean + build，設定改壞時用
+```
+
+專案自己的工具腳本(不是 npm script,直接用 node 跑):
+
+```bash
+node tools/import-hackmd.mjs --list                # 列出 HackMD 上的筆記
+node tools/import-hackmd.mjs --all --out source/_drafts   # 全部匯進草稿
+node tools/localize-images.mjs                     # 預覽:文章裡有哪些外部圖片
+node tools/localize-images.mjs --apply             # 抓回 source/images/ 並改連結
+node tools/drop-bg.mjs <輸入> <輸出> [高度]        # 手寫圖去背(需先裝 sharp)
 ```
 
 > **改了設定卻沒生效** → 先跑 `npm run rebuild`。Hexo 的 `db.json`
@@ -611,6 +624,45 @@ npm config get editor             # 確認來源
 
 **最大的收穫**:網路上的教學講到第 4 步就停了,那是不完整的。
 一定要做第 5 步驗證,才會發現前面白做了。
+
+### 6. `hexo publish` 找不到帶空格的草稿
+
+```bash
+npm run draft:publish "114-1 台大資工大一上修課心得"
+# Error: Draft "114-1-台大資工大一上修課心得" does not exist.
+```
+
+檔案明明就在,為什麼找不到?因為 `hexo publish` 會先把你給的字串丟進
+`slugize()`,再拿結果去比對 `_drafts/` 裡的**檔名開頭**:
+
+```
+slugize("114-1 台大資工大一上修課心得")  →  "114-1-台大資工大一上修課心得"
+實際檔名                                  →  "114-1 台大資工大一上修課心得.md"
+                                                   ↑ 空格,不是 dash
+```
+
+也就是說 `hexo publish` **只找得到 `hexo new draft` 建的草稿**(那些在建檔時就
+slugify 過了)。從 HackMD 匯進來的檔名保留了原標題的空格,一律中不了。
+
+**解法**:專案的 `npm run draft:publish` 已經改成呼叫 `tools/publish-draft.sh`,
+直接比對檔名、不做 slugify,所以空格、括號都沒問題。不要退回去用 `npx hexo publish`。
+
+### 7. 找 bug 前先確認「這是不是真的壞了」
+
+掃全站 HackMD 語法殘留時,正則抓到 14 個 `^上標^`,看起來滿嚴重。
+把實際命中的字串印出來之後才發現:
+
+```
+$O(n\cdot 2^n)$   ← LaTeX,本來就該給 KaTeX 處理
+@#^%&^&#$^#       ← 被消音的髒話
+10:20~12:20       ← 時間區間,不是下標
+```
+
+真正壞掉的只有 1 個。如果當時直接裝 `markdown-it-sup`/`sub` 去「修」,
+反而會把上面這些全部弄壞。
+
+**教訓**:掃描結果只是「候選」,不是「結論」。動手改之前一定要把命中的
+內容連同前後文印出來看過。
 
 ---
 

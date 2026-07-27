@@ -12,12 +12,15 @@
 # 但那個 <strong> 裡的文字仍然是這個值，螢幕閱讀器和搜尋引擎讀的是它。
 title: DnDA's Notes
 
-# ⚠️ 目前沒有作用。
-# 它只是 _config.fluid.yml 裡 index.slogan.text 的備援值
-# （見 node_modules/hexo-theme-fluid/layout/index.ejs 第 3 行：
-#  page.subtitle = theme.index.slogan.text || config.subtitle || ''），
-# 而 slogan 已經設了「人會離去，但故事會留下」，所以這行永遠輪不到。
-# 留著是為了之後若把 slogan 關掉，這裡就會自動生效。
+# 用在兩個地方：
+#
+# 1. RSS 訂閱來源的說明文字。hexo-generator-feed 取的是
+#    config.subtitle || config.description（見該套件 lib/generator.js 第 33 行），
+#    subtitle 有值就輪不到下面的 description，所以 RSS 上顯示的是這一行。
+#
+# 2. 首頁大標下方的副標，但這個用途目前輪不到 —— 它只是 _config.fluid.yml 裡
+#    index.slogan.text 的備援值（見 hexo-theme-fluid/layout/index.ejs 第 3 行），
+#    而 slogan 已經設了「人會離去，但故事會留下」。把 slogan 關掉這裡才會生效。
 subtitle: '筆記與雜記'
 
 # 首頁的分享預覽說明文字（<meta name="description"> 和 og:description）。
@@ -158,6 +161,37 @@ pagination_dir: page
 include:
 exclude:
 ignore:
+
+# RSS 訂閱來源
+# ------------------------------------------------------------------
+# 由 hexo-generator-feed 產生 /atom.xml。讀者可以用 RSS 閱讀器訂閱更新。
+# autodiscovery 會在每頁的 <head> 插入 <link rel="alternate">，閱讀器貼網站
+# 首頁網址就能自動找到訂閱來源，不用手動給 atom.xml 的路徑。
+#
+# 內文用 content: false（只放摘要不放全文）。摘要的取用順序是
+# post.description → post.excerpt → 內文前 content_limit 字
+# （見 node_modules/hexo-generator-feed/lib/generator.js 第 54 行），
+# 每篇都有填 description，所以實際上就是各自的 description。
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  content: false
+  content_limit: 140
+  order_by: -date
+  icon: /img/icon.png
+  autodiscovery: true
+
+# sitemap
+# ------------------------------------------------------------------
+# 由 hexo-generator-sitemap 產生 /sitemap.xml，給搜尋引擎索引用。
+# 標籤頁和分類頁不收錄 —— 它們只是同一批文章的不同排列，收進去對搜尋引擎
+# 來說是重複內容，沒有好處。
+sitemap:
+  path: sitemap.xml
+  rel: false
+  tags: false
+  categories: false
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
