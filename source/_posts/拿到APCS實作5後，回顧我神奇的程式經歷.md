@@ -258,7 +258,7 @@ signed main(){
 random很久後，我發現我的claim沒有被打敗，可能是因為這樣，我的剪枝非常有效，我幾乎不會吃**TLE**。到這時，我就鬆了一口氣，開始休息。
 
 1/20，我收到了APCS成績單，我終於拿到實作五級分了。
-![IMG_9418](https://hackmd.io/_uploads/ryWdR_yt1l.jpg)
+![IMG_9418](/images/ryWdR_yt1l.jpg)
 
 
 註：我後來發現我的claim是錯的，只是random出來可以攻擊到的測資的機率太低，所以在場內才沒弄出來。而且就算符合條件的數不只兩組也不會太多，我的code還是能正確處理，因此有拿到滿分。

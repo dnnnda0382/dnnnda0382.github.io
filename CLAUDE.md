@@ -92,6 +92,7 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 ├── tools/publish-draft.sh   # npm run draft:publish 背後的腳本
 ├── tools/check-frontmatter.mjs # npm run check，也被 publish-draft.sh 呼叫
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
+├── tools/localize-images.mjs # 把文章裡的外部圖片抓回 source/images/
 ├── tools/drop-bg.mjs        # 手寫圖去背（產生 logo.png / icon.png）
 └── .github/workflows/deploy.yml  # 自動部署
 ```
@@ -361,10 +362,38 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 ### 匯入後要人工確認的事
 
 - **圖片仍指向 HackMD / imgur 的外部網址**，原始檔被刪掉就會失效。
-  要落地的話得自己下載到 `source/images/` 再改連結。
+  用 `tools/localize-images.mjs` 抓回本機（見下方「把外部圖片抓回本機」）。
 - **沒標語言的程式碼區塊不會上色**，想上色要自己補上 ` ```cpp ` 之類的標記。
   （HackMD 的 ` ```cpp=1 ` 這種行號語法 Hexo 看得懂，不用改。）
 - `tags` 和 `categories` 匯入後是空的，要自己補。
+
+## 把外部圖片抓回本機
+
+`tools/localize-images.mjs` 會掃出文章裡的外部圖片，下載到 `source/images/`
+再把連結改成 `/images/檔名`。
+
+```bash
+node tools/localize-images.mjs                    # 預覽，不動任何檔案
+node tools/localize-images.mjs --apply            # 實際下載並改寫
+node tools/localize-images.mjs --drafts --apply   # 改處理 source/_drafts
+```
+
+抓不到的會保留原連結不改（總比連結變成 404 好），最後會列出來。
+下載用 `curl` 而不是 node 的 `fetch` —— 實測部分 CDN（acfun）在某些環境下
+`fetch` 會 TLS 失敗，`curl` 拿得到。
+
+⚠️ **手機拍的照片會帶 EXIF，裡面可能有 GPS 座標。**
+HackMD 不會幫你清掉，所以從那邊抓回來的照片是連 metadata 一起下載的。
+這個工具**刻意不動 EXIF**（原樣保留），因為「要不要清」是內容決定不是技術決定。
+處理個人照片前請自己確認一次：
+
+```bash
+# 看有沒有 GPS 區段
+node -e 'const d=require("fs").readFileSync(process.argv[1]);console.log(d.includes(Buffer.from("GPS"))?"可能有 GPS":"沒找到")' source/images/xxx.jpg
+```
+
+真的要清的話，裝 sharp 後 `sharp(f).rotate().toFile(out)` 會在套用完方向修正後
+丟掉所有 metadata（`.rotate()` 不加參數 = 依 EXIF 自動轉正，不然清完照片可能會躺著）。
 
 ## HackMD 語法在這裡的支援狀況
 
