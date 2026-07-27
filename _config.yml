@@ -134,10 +134,19 @@ meta_generator: true
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
 ## updated_option supports 'mtime', 'date', 'empty'
-## mtime = 用「檔案的修改時間」當更新時間。代價是改個錯字、甚至只是重新存檔，
-##         那篇的更新時間就會跳動。
-## date  = 更新時間永遠等於發布時間，不會因為小修改而變動。
-updated_option: 'mtime'
+## 用 'date'：更新時間永遠等於發布時間。
+##
+## 不用預設的 'mtime'（檔案修改時間），因為在 CI 上那個值是錯的 ——
+## GitHub Actions 每次 build 都重新 git clone，clone 出來的檔案 mtime 是
+## clone 當下的時間，所以線上版每篇文章的「更新時間」都會變成「最近一次
+## 部署的時間」，等於假資訊。本機也一樣敏感：改個錯字、甚至只是重新存檔
+## 就會跳動。
+##
+## 目前這個值只影響 <meta property="article:modified_time">，
+## Fluid 的 post.updated.enable 預設是 false，頁面上不顯示更新時間。
+## 某篇真的有實質改版時，在該篇 front-matter 手動加 updated: 即可，
+## 那個優先權高於這裡的自動推算。
+updated_option: 'date'
 
 # Pagination
 ## Set per_page to 0 to disable pagination

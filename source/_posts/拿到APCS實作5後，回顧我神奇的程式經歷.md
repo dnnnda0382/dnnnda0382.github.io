@@ -3,6 +3,7 @@ title: 拿到APCS實作5後，回顧我神奇的程式經歷
 date: 2025-01-25 18:45:55
 tags: ["競程", "APCS"]
 categories: ["雜記"]
+description: ''
 hackmd_id: TDteznfsTA-kn9yRRRjR_A
 ---
 
