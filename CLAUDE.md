@@ -349,6 +349,7 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 | `:::spoiler 標題` | `{% fold %}` | Fluid 的摺疊區塊 |
 | `:::info` / `:::warning` 等 | `{% note %}` | Fluid 的提示框 |
 | 數學式裡的 `{{` | `{ {` | 不然 Nunjucks 會讓 build 失敗（見「已知的坑」） |
+| `![image](...)` / `![IMG_9732](...)` | `![](...)` | 見下方「圖片的 alt 會變成圖說」 |
 
 行內的 `||暴雷內容||` **不需要轉換**，原樣留著就好 —— 由
 `scripts/markdown-it-spoiler.js` 在渲染階段處理（見下方「行內暴雷語法」）。
@@ -366,6 +367,28 @@ Token 放在 `.env` 的 `HACKMD_TOKEN`（**`.env` 已被 `.gitignore` 排除，�
 - **沒標語言的程式碼區塊不會上色**，想上色要自己補上 ` ```cpp ` 之類的標記。
   （HackMD 的 ` ```cpp=1 ` 這種行號語法 Hexo 看得懂，不用改。）
 - `tags` 和 `categories` 匯入後是空的，要自己補。
+
+## 圖片的 alt 會變成圖說
+
+Fluid 的 `post.image_caption.enable` 預設是開的，它的 JS 會把 `<img>` 的
+`title` 或 `alt` 插成圖片下方的 `<figcaption>`（見
+`node_modules/hexo-theme-fluid/source/js/plugins.js` 的 `imageCaption`）。
+
+問題是 HackMD 貼圖時 alt 預設填 `image`，從相簿拖進去則是 `IMG_9732`，
+於是每張圖底下都掛著一串沒意義的檔名。
+
+**解法是把 alt 清成空的，不是關掉 `image_caption`** —— 關掉的話以後真的想寫
+圖說也沒得寫。alt 是空字串時 Fluid 拿不到內容就不會產生 figcaption，而且空
+alt 對螢幕閱讀器正好是「裝飾性圖片，略過」的正確標示，比 `alt="image"` 好。
+
+```markdown
+![](/images/xxx.png)          ← 不顯示圖說
+![選訓營的午餐](/images/xxx.png)  ← 圖片下方顯示「選訓營的午餐」
+```
+
+`tools/import-hackmd.mjs` 匯入時會自動清掉 `image` / `IMG_xxxx` /
+`Screenshot...` / `DSC1234` / 一長串數字這類自動產生的 alt，自己寫的圖說一律
+保留（連 `image of the day` 這種以 image 開頭的真實圖說也不會被誤清）。
 
 ## 把外部圖片抓回本機
 
