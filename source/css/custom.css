@@ -12,6 +12,34 @@
  *   [data-user-color-scheme="dark"] .markdown-body { color: #ddd; }
  */
 
+/* 導覽列標題換成手寫圖 source/img/logo.png
+   ------------------------------------------------------------------
+   _config.fluid.yml 的 navbar.blog_title 只吃純文字（樣板用的是會跳脫 HTML 的
+   <%= %>，見 node_modules/hexo-theme-fluid/layout/_partials/header/navigation.ejs），
+   塞不進 <img>，所以改用 CSS 把 <strong> 的文字換成背景圖。
+
+   用 font-size: 0 藏文字而不是 display: none —— 「DnDA's Notes」這串字要留在
+   HTML 裡，螢幕閱讀器和搜尋引擎才讀得到，只是視覺上被圖片取代。
+
+   圖是 431x84（顯示尺寸的 3 倍），高 DPI 螢幕才不會糊。筆畫是純白，導覽列在
+   淺色模式是 #4a2130、深色是 #27141e，兩個都夠深，白色在兩種模式都看得清楚。 */
+.navbar-brand strong {
+  display: inline-block;
+  font-size: 0;
+  width: 144px;
+  height: 28px;
+  background: url(/img/logo.png) no-repeat left center / contain;
+  vertical-align: middle;
+}
+
+/* 手機版導覽列窄，縮小一點免得跟漢堡選單擠在一起 */
+@media (max-width: 480px) {
+  .navbar-brand strong {
+    width: 113px;
+    height: 22px;
+  }
+}
+
 /* 讓行內程式碼更好認 */
 .markdown-body code:not([class*="language-"]) {
   padding: 0.15em 0.4em;
