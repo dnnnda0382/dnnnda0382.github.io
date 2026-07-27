@@ -49,6 +49,7 @@ Node 20.19+ 才有的 `require(ESM)` 功能來載入 ESM-only 的 `strip-ansi`�
 npm run new "文章標題"        # 新增文章（進 _posts，會公開）
 npm run draft "標題"          # 新增草稿（進 _drafts，私密）
 npm run draft:publish "標題"  # 草稿 → 文章
+npm run check                 # 盤點文章缺哪些 front-matter 欄位
 npm run server                # 本機預覽 → http://localhost:4000
 npm run server:draft          # 本機預覽，含草稿
 npm run build                 # 產生靜態檔到 public/
@@ -88,6 +89,7 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 │   └── wordcount-skip-katex.js    # 字數統計扣掉 KaTeX 的 MathML 分身
 ├── tools/new-post.sh        # npm run new 背後的腳本
 ├── tools/publish-draft.sh   # npm run draft:publish 背後的腳本
+├── tools/check-frontmatter.mjs # npm run check，也被 publish-draft.sh 呼叫
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
 ├── tools/drop-bg.mjs        # 手寫圖去背（產生 logo.png / icon.png）
 └── .github/workflows/deploy.yml  # 自動部署
@@ -217,6 +219,19 @@ description: ''
 `npm run draft:publish` 在發布前會檢查 `tags` / `categories` / `description`
 有沒有填，缺的會列出來提醒（但不會擋，只是提醒）。這三個欄位事後補上再 push
 都會生效，不影響網址。
+
+想一次看所有文章缺什麼就跑 `npm run check`：
+
+```bash
+npm run check              # 掃 source/_posts
+npm run check -- --drafts  # 改掃 source/_drafts
+```
+
+`published: false` 的文章會標成「(未發布)」，且不列入最後的統計 —— 它們不會
+出現在網站上，缺欄位沒有影響。
+
+判斷邏輯統一寫在 `tools/check-frontmatter.mjs`，`draft:publish` 也是呼叫它，
+所以發布前的提醒和這張盤點表永遠一致。改「哪些欄位算填了」只要改那一個檔案。
 
 ---
 

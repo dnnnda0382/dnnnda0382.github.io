@@ -96,31 +96,9 @@ echo
 
 # front-matter 檢查
 # ------------------------------------------------------------------
-# 用 node 讀而不是 grep —— YAML 的寫法太多（[a, b] / 條列式 / 引號有無），
-# grep 判斷不準。hexo-front-matter 是 Hexo 自己在用的 parser，跟 build 時
-# 看到的結果一致。
-node -e '
-const fm = require("hexo-front-matter");
-const fs = require("fs");
-const d = fm.parse(fs.readFileSync(process.argv[1], "utf8"));
-const missing = [];
-const show = v => Array.isArray(v) ? `[${v.join(", ")}]` : String(v);
-const check = (key, label, hint) => {
-  const v = d[key];
-  const empty = v == null || (Array.isArray(v) && v.length === 0) || String(v).trim() === "";
-  if (empty) { missing.push(label); console.log(`  ✗ ${key.padEnd(12)}缺少 —— ${hint}`); }
-  else console.log(`  ✓ ${key.padEnd(12)}${show(v)}`);
-};
-console.log("front-matter 檢查：");
-check("tags", "tags", "標籤頁不會收錄這篇");
-check("categories", "categories", "分類頁不會收錄這篇");
-check("description", "description", "分享連結時預覽會抓內文前 200 字，通常會斷在半句話");
-if (missing.length) {
-  console.log("");
-  console.log(`⚠️  有 ${missing.length} 個欄位沒填：${missing.join("、")}`);
-  console.log("   照樣可以發布，之後補上再 push 也會生效（不影響網址）。");
-}
-' "$SRC"
+# 邏輯放在 tools/check-frontmatter.mjs（同一個檔案也是 npm run check 在用的），
+# 「哪些欄位算填了」只定義一次，這裡的提醒和那張盤點表才不會各說各話。
+node tools/check-frontmatter.mjs "$SRC"
 
 echo
 echo "⚠️  發布後 push 出去，內容就會進入公開 repo，實務上收不回來。"
