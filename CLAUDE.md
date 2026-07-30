@@ -94,11 +94,25 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
 ├── tools/localize-images.mjs # 把文章裡的外部圖片抓回 source/images/
 ├── tools/drop-bg.mjs        # 手寫圖去背（產生 logo.png / icon.png）
+├── tools/gen-emoji-aliases.mjs # 產生 emoji 補充別名表（很少跑，需要網路）
+├── tools/emoji-aliases.json # ↑ 的產物，被 scripts/markdown-it-emoji.js 讀取
 └── .github/workflows/deploy.yml  # 自動部署
 ```
 
-`scripts/` 這個資料夾名稱被 Hexo 佔用了 —— Hexo 會把裡面的 `.js` 當**外掛**自動載入。
+`scripts/` 這個資料夾名稱被 Hexo 佔用了 —— 裡面的東西會被當**外掛**自動載入。
 所以那裡只放真的要當外掛跑的東西，自己寫的工具腳本一律放 `tools/`。
+
+⚠️ **不是只有 `.js` 會被載入，是「每一個檔案」。** Hexo 的作法是
+`listDir(scripts/)` 撈出所有檔案再逐一 `loadPlugin`，**完全沒有濾副檔名**
+（見 `node_modules/hexo/dist/hexo/load_plugins.js` 的 `loadScripts`）。
+所以外掛要用的資料檔（`.json` 之類的）**不能放這裡**，會被當成 JS 載入而噴：
+
+```
+ERROR Script load failed: scripts/emoji-aliases.json
+SyntaxError: Unexpected token ':'
+```
+
+資料檔一律放 `tools/`，從外掛裡用相對路徑 `require('../tools/xxx.json')` 讀。
 
 ⚠️ Hexo 是用 bluebird 的併發 `.map` 同時載入主題的 `scripts/` 和這裡的 `scripts/`
 （見 `node_modules/hexo/dist/hexo/load_plugins.js` 的 `loadScripts`），**先後順序不保證**。
@@ -459,6 +473,43 @@ $O(n\cdot 2^n)$      ← LaTeX，本來就由 KaTeX 處理
 
 emoji 外掛刻意只開短碼、關掉 ASCII 表情（`:)` `:D` `:/` 那些）的自動轉換，
 理由寫在 `scripts/markdown-it-emoji.js` 的檔頭。
+
+### emoji 短碼的命名對不上（別名表）
+
+`markdown-it-emoji` 內建的是 **GitHub（gemoji）** 那套命名，HackMD 用的卻是
+**JoyPixels / CLDR** 那套，同一個 emoji 名字常常對不上，結果就是短碼原封不動
+印在文章裡：
+
+```
+🤯   gemoji: :exploding_head:   HackMD 貼過來: :shocked_face_with_exploding_head:
+```
+
+`tools/emoji-aliases.json` 收了 JoyPixels / CLDR / emojibase 幾套命名裡「gemoji
+沒有」的名字（約 1900 個），由 `scripts/markdown-it-emoji.js` 合併進字典。
+
+**這個 JSON 是產生出來的，不要手改**，要更新或補漏網之魚請改
+`tools/gen-emoji-aliases.mjs`（裡面有一個 `OVERRIDES` 給查不到的名字用）再重跑：
+
+```bash
+node tools/gen-emoji-aliases.mjs   # 需要網路，從 unpkg 抓來源資料
+```
+
+它產生的是**差集**不是完整字典 —— gemoji 的部分仍然由套件自己提供，
+`npm update` 時會跟著更新，不會被這個檔案凍住。
+
+⚠️ 有些名字**任何現成資料集都查不到**。`:shocked_face_with_exploding_head:` 就是
+U+1F92F 在 Emoji 5.0 剛出時的舊名，後來 Unicode 改名成 exploding head，現行的
+emoji-toolkit 和 emojibase（cldr / joypixels / emojibase / github 四套都查過）
+通通沒有這個字串，只能寫進 `OVERRIDES` 手動對上去。
+
+**查不到的短碼會在 build 時警告**（不擋 build），像這樣：
+
+```
+WARN [emoji] _posts/xxx.md：有 1 個短碼查不到對應的 emoji —— :foo_bar:
+```
+
+所以不用自己去翻文章找漏網之魚，`npm run build` 的輸出會講。掃描時會先拿掉
+`<pre>` / `<code>`、跳過純數字（時間 `10:45:30`），實測整站零誤報。
 
 ## 行內暴雷語法 `||...||`
 
