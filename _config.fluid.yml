@@ -133,17 +133,17 @@ post:
   banner_img: /img/cover.jpg
 
   meta:
-    # 預估閱讀時間
+    # 預估閱讀時間 —— 關掉，文章頁只留字數統計
+    min2read:
+      enable: false
+
+    # 字數統計
     # ------------------------------------------------------------------
-    # 每分鐘字數 = awl × wpm。主題預設 2 × 60 = 120 字/分鐘，對中文來說太慢，
-    # 這裡改成 2 × 150 = 300 字/分鐘。
-    #
     # 「字數」實際上是去掉 HTML 標籤和空白後的「字元數」
     # （見 node_modules/hexo-theme-fluid/scripts/helpers/wordcount.js），
     # 計算前會先由 scripts/wordcount-skip-katex.js 扣掉 KaTeX 的 MathML 分身。
-    min2read:
-      awl: 2
-      wpm: 150
+    wordcount:
+      enable: true
 
   # 數學公式
   # ------------------------------------------------------------------
