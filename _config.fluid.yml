@@ -41,9 +41,16 @@ code:
       preprocess: true
 
 # 深色模式
+# ------------------------------------------------------------------
+# default 可以是 auto | light | dark：
+#   auto = 先看系統的 prefers-color-scheme，沒有的話再看訪客本地時間（18:00~06:00 進深色）
+#   dark = 一律預設深色
+# 只影響「還沒手動切換過」的訪客 —— 按過導覽列右上角切換鈕的人，選擇會存進
+# localStorage 的 user-color-scheme，之後就不再跟隨這個預設值
+# （見 node_modules/hexo-theme-fluid/source/js/color-schema.js）。
 dark_mode:
   enable: true
-  default: auto  # 跟隨系統設定
+  default: dark
 
 # 配色
 # ------------------------------------------------------------------
