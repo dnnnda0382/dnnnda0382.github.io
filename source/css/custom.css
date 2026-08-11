@@ -103,3 +103,27 @@
   max-width: 100%;
   overflow-x: auto;
 }
+
+/* 訪問統計（不蒜子）的兩個補丁
+   ------------------------------------------------------------------
+   兩個問題都出在主題模板，不是設定能解的，所以在這裡蓋回來。 */
+
+/* 1. 頁尾的「總訪問量 / 總訪客數」字級
+   主題的規則是 .footer-inner > div:not(:first-child) { font-size: .85rem }
+   （見 node_modules/hexo-theme-fluid/source/css/_pages/_base/_widget/footer.styl），
+   它假設頁尾第一格一定是 footer.content。但 _config.fluid.yml 把 content 設成
+   空字串（不顯示「Hexo ❤ Fluid」推廣連結），那個 div 根本不會輸出，於是
+   .statistics 變成 :first-child、被 :not() 排除，字就跟內文一樣大。 */
+.footer-inner > .statistics:first-child {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
+
+/* 2. 文章頁瀏覽次數的眼睛圖示間距
+   主題在 meta-top.ejs 裡，leancloud 和 umami 兩個分支的 <span> 都有
+   class="post-meta"，只有 busuanzi 和 openkounter 這兩個分支漏掉了。
+   少了那個 class 就吃不到 .post-meta > * { margin-right: .2rem }，
+   圖示會緊貼著數字，跟旁邊的字數統計對不齊。 */
+#busuanzi_container_page_pv > * {
+  margin-right: 0.2rem;
+}

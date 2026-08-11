@@ -152,6 +152,20 @@ post:
     wordcount:
       enable: true
 
+    # 瀏覽次數（不蒜子）
+    # ------------------------------------------------------------------
+    # 顯示在標題底下那排 meta 裡，跟字數並排。數字由不蒜子的伺服器依「網址」
+    # 計數，不需要註冊也不用任何金鑰 —— 頁面載入 busuanzi.pure.mini.js，
+    # 它帶著 Referer 回報一次，伺服器加一再把數字塞回頁面。
+    #
+    # zh-TW 語系包的預設字串是 '{} 次'（見 node_modules/hexo-theme-fluid/
+    # languages/zh-TW.yml），旁邊的字數是「3.2k 字」，兩個並排時「89 次」
+    # 看不出是什麼的次數，所以這裡覆寫成完整的說法。
+    views:
+      enable: true
+      source: "busuanzi"
+      format: "{} 次瀏覽"
+
   # 數學公式
   # ------------------------------------------------------------------
   # 這裡設 katex 只會載入 KaTeX 的「CSS」，不會載入 auto-render JS。
@@ -275,6 +289,50 @@ links:
 #   content: '<span>© 2026 DnDA</span>'
 footer:
   content: ""
+
+  # 全站訪問統計（不蒜子）
+  # ------------------------------------------------------------------
+  # 頁尾顯示「總訪問量 X 次 / 總訪客數 Y 人」。PV 是瀏覽次數，UV 靠 cookie
+  # 認人，同一個人重複來只算一次。
+  #
+  # ⚠️ 沒有後台、沒有歷史趨勢 —— 不蒜子只回傳「當下的累計數字」，看不到
+  #    每日走勢、也不知道大家在看哪一篇。要那些請看下面 custom_head 那段。
+  #
+  # ⚠️ 本機 npm run server 預覽時數字會大得離譜（不蒜子依網址計數，localhost
+  #    這組 key 是全世界所有用不蒜子的人共用的），部署到正式網址就正常了。
+  #    也因為這樣，本機預覽的瀏覽不會汙染正式站的數字。
+  #
+  # ⚠️ 這是第三方免費服務（busuanzi.ibruce.info），對方掛掉的話數字就不會
+  #    出現。Fluid 的模板把容器預設 display:none，抓不到數字就整段不顯示，
+  #    不會留下「總訪問量  次」這種半截字（見
+  #    node_modules/hexo-theme-fluid/layout/_partials/footer/statistics.ejs）。
+  statistics:
+    enable: true
+    source: "busuanzi"
+
+# 私人統計後台（GoatCounter）
+# ------------------------------------------------------------------
+# 上面的不蒜子只給「累計總數」給訪客看。想知道每天多少人來、大家在看哪一篇、
+# 從哪裡連過來的，需要一個有後台的服務。
+#
+# 這裡選 GoatCounter：免費（個人非商業站）、不用 cookie、不蒐集個資，
+# 所以不需要跳 cookie 同意視窗。後台預設只有自己看得到。
+#
+# custom_head 吃的是原始 HTML，會原樣插進每一頁的 <head>
+# （見 node_modules/hexo-theme-fluid/layout/_partials/head.ejs 第 42 行）。
+#
+# 啟用步驟：
+#   1. 到 https://www.goatcounter.com/signup 註冊，Code 欄填一個代號
+#      （例如 dnnnda），後台網址就會是 https://dnnnda.goatcounter.com
+#   2. 把下面兩行的 # 拿掉
+#   3. 把 YOUR-CODE 換成第 1 步填的代號
+#   4. npm run server 確認沒有 build error，再 commit + push
+#
+# ⚠️ 只有部署到正式網址才會有資料。本機 localhost 的瀏覽 GoatCounter 也會收，
+#    想避免的話後台 Settings → Ignore IPs，或先別在本機開著預覽逛。
+#
+# custom_head: >-
+#   <script data-goatcounter="https://YOUR-CODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
 # 自訂樣式覆寫（路徑相對於 source/ 目錄）
 # 要調整外觀請改 source/css/custom.css，不要動 node_modules 裡的主題原始檔
