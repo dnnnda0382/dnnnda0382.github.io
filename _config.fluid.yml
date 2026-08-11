@@ -296,7 +296,8 @@ footer:
   # 認人，同一個人重複來只算一次。
   #
   # ⚠️ 沒有後台、沒有歷史趨勢 —— 不蒜子只回傳「當下的累計數字」，看不到
-  #    每日走勢、也不知道大家在看哪一篇。要那些請看下面 custom_head 那段。
+  #    每日走勢、也不知道大家在看哪一篇。那些由下面 custom_head 的
+  #    GoatCounter 負責，兩者各做各的、互不干擾。
   #
   # ⚠️ 本機 npm run server 預覽時數字會大得離譜（不蒜子依網址計數，localhost
   #    這組 key 是全世界所有用不蒜子的人共用的），部署到正式網址就正常了。
@@ -321,18 +322,16 @@ footer:
 # custom_head 吃的是原始 HTML，會原樣插進每一頁的 <head>
 # （見 node_modules/hexo-theme-fluid/layout/_partials/head.ejs 第 42 行）。
 #
-# 啟用步驟：
-#   1. 到 https://www.goatcounter.com/signup 註冊，Code 欄填一個代號
-#      （例如 dnnnda），後台網址就會是 https://dnnnda.goatcounter.com
-#   2. 把下面兩行的 # 拿掉
-#   3. 把 YOUR-CODE 換成第 1 步填的代號
-#   4. npm run server 確認沒有 build error，再 commit + push
+# 後台在 https://dnnnda.goatcounter.com
 #
-# ⚠️ 只有部署到正式網址才會有資料。本機 localhost 的瀏覽 GoatCounter 也會收，
-#    想避免的話後台 Settings → Ignore IPs，或先別在本機開著預覽逛。
+# ⚠️ 本機預覽不會被記錄，不用特別關掉。count.js 的 goatcounter.filter() 會擋掉
+#    localhost、127.x、10.x、172.16-31.x、192.168.x 和 file:// —— 除非自己設
+#    allow_local。所以本機怎麼逛都不會汙染統計數字。
 #
-# custom_head: >-
-#   <script data-goatcounter="https://YOUR-CODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+# ⚠️ 官方給的 snippet 是 protocol-relative 的 //gc.zgo.at/count.js，這裡寫死
+#    https。本機預覽是 http，protocol-relative 會去要 http 版再吃一次重導。
+custom_head: >-
+  <script data-goatcounter="https://dnnnda.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 
 # 自訂樣式覆寫（路徑相對於 source/ 目錄）
 # 要調整外觀請改 source/css/custom.css，不要動 node_modules 裡的主題原始檔
