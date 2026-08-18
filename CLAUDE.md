@@ -293,6 +293,37 @@ RSS 的每篇摘要取用順序是 `post.description` → `post.excerpt` → 內
 
 `published: false` 的文章不會進 feed 也不會進 sitemap，已驗證。
 
+### 讓搜尋引擎收錄
+
+⚠️ **有 sitemap ≠ 會被 Google 搜到。** `hexo-generator-sitemap` 只是產生
+`/sitemap.xml` 這個檔案，它不會主動通知任何搜尋引擎；而 `dnnnda0382.github.io`
+這種沒有外部連結指進來的 github.io 子網域，爬蟲根本沒有理由發現它的存在。
+2026-08-18 實測 `site:dnnnda0382.github.io` 在 Google 是零筆。
+
+站方這側該有的都有了：
+
+| 東西 | 在哪 | 作用 |
+|---|---|---|
+| `/sitemap.xml` | `_config.yml` 的 `sitemap:` | 列出全站網址 |
+| `/robots.txt` | `source/robots.txt` | 允許索引，並用 `Sitemap:` 指出 sitemap 位置 |
+| `<link rel="canonical">` | `_config.fluid.yml` 的 `canonical.enable` | 避免 `/path/` 和 `/path/index.html` 被當成重複內容 |
+
+**剩下的一步只有帳號擁有者做得到**：到
+[Google Search Console](https://search.google.com/search-console) 用
+「URL 前置字元」建立 `https://dnnnda0382.github.io/` 這個資源、驗證所有權、
+提交 sitemap，再對首頁按一次「要求建立索引」。
+
+驗證方式選 **HTML 檔案**最單純 —— 下載下來的 `googlexxxx.html` 直接丟進
+`source/` 就會被複製到站台根目錄。`_config.yml` 的 `skip_render` 已經先加了
+`google*.html`，確保那個檔案不會被 Hexo 渲染過而驗證失敗。
+
+（Bing Webmaster Tools 支援從 Search Console 一鍵匯入，驗證過 Google 之後
+順手做掉就好。）
+
+送出後**還要等數天到數週**才會出現在搜尋結果，這是正常的。想加速就從
+HackMD 個人頁、GitHub profile 之類已被收錄的地方連過來，爬蟲順著連結找過來
+比等 sitemap 快得多。
+
 ---
 
 ## 私人草稿庫（重要）
