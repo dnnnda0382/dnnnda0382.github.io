@@ -119,7 +119,14 @@ navbar:
     - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
 
 # 站內搜尋（Fluid 內建 local search，不需額外裝 plugin）
+# ⚠️ 這是「站內」搜尋，跟被 Google 搜到是兩回事，後者靠的是 sitemap + robots.txt
+#    + Google Search Console，見 CLAUDE.md 的「讓搜尋引擎收錄」。
 search:
+  enable: true
+
+# 在每頁 <head> 輸出 <link rel="canonical">，告訴搜尋引擎哪個才是正版網址。
+# 同一頁可能有 /path/ 和 /path/index.html 兩種進法，不指定的話會被當成內容重複。
+canonical:
   enable: true
 
 # 頭圖（各頁面上方的背景圖）

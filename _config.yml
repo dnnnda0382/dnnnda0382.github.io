@@ -65,7 +65,11 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
+# 這裡列的檔案「原樣複製」到 public/，不經過 Hexo 的渲染流程。
+# google*.html 是 Google Search Console 的所有權驗證檔（之後放進 source/ 就會生效），
+# 那種檔案內容是固定的一行，被渲染過就驗證不過。
 skip_render:
+  - google*.html
 
 # Writing
 new_post_name: :title.md # File name of new posts
