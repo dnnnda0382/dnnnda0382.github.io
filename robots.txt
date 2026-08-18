@@ -1,0 +1,7 @@
+# 允許所有搜尋引擎索引全站。
+User-agent: *
+Allow: /
+
+# 告訴爬蟲 sitemap 在哪。這是「不用註冊 Search Console 也有效」的唯一一條線索，
+# 由 hexo-generator-sitemap 產生（設定在根目錄 _config.yml 的 sitemap:）。
+Sitemap: https://dnnnda0382.github.io/sitemap.xml
