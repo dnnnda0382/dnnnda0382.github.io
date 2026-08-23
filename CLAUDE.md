@@ -50,6 +50,7 @@ npm run new "文章標題"        # 新增文章（進 _posts，會公開）
 npm run draft "標題"          # 新增草稿（進 _drafts，私密）
 npm run draft:publish "標題"  # 草稿 → 文章
 npm run check                 # 盤點文章缺哪些 front-matter 欄位
+npm run redate "標題"         # 把該篇的 date 改成現在（＝真正的發布時間）
 npm run server                # 本機預覽 → http://localhost:4000
 npm run server:draft          # 本機預覽，含草稿
 npm run build                 # 產生靜態檔到 public/
@@ -91,6 +92,7 @@ Hexo 的 `db.json` 快取有時候會讓改動看起來沒生效。先跑 `npm r
 ├── tools/new-post.sh        # npm run new 背後的腳本
 ├── tools/publish-draft.sh   # npm run draft:publish 背後的腳本
 ├── tools/check-frontmatter.mjs # npm run check，也被 publish-draft.sh 呼叫
+├── tools/redate.mjs         # npm run redate，也被 publish-draft.sh 呼叫
 ├── tools/import-hackmd.mjs  # HackMD 匯入工具
 ├── tools/localize-images.mjs # 把文章裡的外部圖片抓回 source/images/
 ├── tools/drop-bg.mjs        # 手寫圖去背（產生 logo.png / icon.png）
@@ -207,6 +209,20 @@ description: ''
 - **date**：`npm run new` 會自動填當下時間，通常不用改。
   ⚠️ 改 date **會改掉網址**（permalink 是 `:year/:month/:day/:title/`），舊連結會壞。
   檔名同理。內容、title、tags 怎麼改都不影響網址。
+
+  文章擱了一陣子才發布的話，`date` 會停在**建立**的時間，而首頁排序、封存頁、
+  RSS 用的都是它。發布前跑 `npm run redate "標題"` 可以蓋成當下時間：
+
+  ```bash
+  npm run redate "114-2 台大資工大一下修課心得"
+  ```
+
+  它會先印出新舊 date 和新舊網址再要求按 y。**如果那篇已經上線**（在版控裡
+  而且 HEAD 的版本不是 `published: false`），還會特別警告舊網址即將 404 ——
+  這種情況通常就不該改了。`REDATE_YES=1` 可以跳過確認給腳本用。
+
+  ⚠️ **刻意沒有做成 git hook 自動蓋時間。** 那樣的話改個錯字都會順手換掉
+  已上線文章的網址。改 date 必須是明確的動作。
 - **description**：分享連結時預覽卡片顯示的那段文字，**請務必填**。
   不填的話 Fluid 會退而取內文的前 200 字（見
   `node_modules/hexo-theme-fluid/layout/_partials/head.ejs` 開頭那段
@@ -365,6 +381,7 @@ npm run draft "標題"          # 建立草稿
 npm run server:draft          # 預覽時包含草稿
 npm run draft:publish         # 不給參數 = 列出所有草稿
 npm run draft:publish "標題"  # 把草稿移到 _posts（等於決定要公開了）
+npm run draft:publish --keep-date "標題"   # 同上，但保留草稿原本的 date
 ```
 
 `draft:publish` 走的是 `tools/publish-draft.sh`，**不是 `hexo publish`**。
@@ -386,6 +403,11 @@ slugify 過了）。從 HackMD 匯進來的檔名一律保留原標題的空格�
 命中多筆時列出候選、目標已存在時拒絕覆蓋，以及**發布前的 y/N 確認**（因為搬進
 `_posts` 再 push 就收不回來了，見上面的事故記錄）。非互動式環境會直接拒絕，
 要在腳本裡跑請加 `PUBLISH_YES=1`。
+
+**發布時預設會把 `date` 蓋成當下時間**（呼叫 `tools/redate.mjs`，跟
+`npm run redate` 同一份邏輯），因為草稿的 date 是建立時間，放久了就過期。
+草稿還沒上線過、沒有舊網址可壞，所以這裡不會再多問一次。
+從 HackMD 匯進來的舊筆記通常會想留著當初寫的日期，那就加 `--keep-date`。
 
 ## 從 HackMD 匯入舊筆記
 

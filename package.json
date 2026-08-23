@@ -7,6 +7,7 @@
     "draft": "hexo new draft",
     "draft:publish": "tools/publish-draft.sh",
     "check": "node tools/check-frontmatter.mjs",
+    "redate": "node tools/redate.mjs",
     "server": "hexo server",
     "server:draft": "hexo server --draft",
     "build": "hexo generate",
